@@ -2,11 +2,17 @@
 
 This is a package for writing to a HOIN POS-80-Series Thermal Printer
 
-TODO:
+General Commands:
 
-- [ ] HT ~ Horizontal Tab
-- [ ] LF ~ Print and line feed
-- [ ] CR ~ Print and carriage return
+- [x] Print
+- [x] Printf
+- [x] Println
+
+Programmer Manual Commands:
+
+- [x] HT ~ Horizontal Tab
+- [x] LF ~ Print and line feed
+- [x] CR ~ Print and carriage return
 - [ ] DLE EOT n ~ Real-time status transmission
 - [ ] DLE DC4 n m t ~ Generate pulse at real-time
 - [ ] ESC SP n ~ Set right-side character spacing
