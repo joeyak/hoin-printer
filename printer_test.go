@@ -11,10 +11,7 @@ import (
 
 func newPrinter() (*bytes.Buffer, hoin.Printer) {
 	buffer := &bytes.Buffer{}
-	return buffer, hoin.Printer{
-		Writer: buffer,
-		Width:  80,
-	}
+	return buffer, hoin.NewPrinter(buffer)
 }
 
 func TestHT(t *testing.T) {
@@ -42,6 +39,27 @@ func TestCR(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, "\x0D", buffer.String())
+}
+
+func TestInitialize(t *testing.T) {
+	buffer, printer := newPrinter()
+
+	err := printer.Initialize()
+
+	assert.NoError(t, err)
+	assert.Equal(t, []byte{hoin.ESC, '@'}, buffer.Bytes())
+}
+
+func FuzzWriteRaw(f *testing.F) {
+	f.Add([]byte("Test"))
+	f.Fuzz(func(t *testing.T, b []byte) {
+		buffer, printer := newPrinter()
+
+		err := printer.WriteRaw(b)
+
+		assert.NoError(t, err)
+		assert.Equal(t, string(b), buffer.String())
+	})
 }
 
 func FuzzPrintln(f *testing.F) {

@@ -6,33 +6,42 @@ import (
 )
 
 const (
-	HT  = "\x09"
-	LF  = "\x0A"
-	CR  = "\x0D"
-	DLE = "\x10"
-	EOT = "\x04"
+	HT  = 0x09
+	LF  = 0x0A
+	CR  = 0x0D
+	ESC = 0x1B
+	DLE = 0x10
+	EOT = 0x04
 )
 
 type Printer struct {
-	Writer io.Writer
-	Width  int
+	dst io.Writer
 }
 
-func (p *Printer) write(b []byte) error {
-	if p.Writer == nil {
-		return fmt.Errorf("no writer was set")
+func NewPrinter(dst io.ReadWriter) Printer {
+	return Printer{
+		dst: dst,
 	}
+}
 
-	_, err := p.Writer.Write(b)
+func (p *Printer) WriteRaw(b []byte) error {
+	_, err := p.dst.Write(b)
 	if err != nil {
 		return fmt.Errorf("could not write to printer: %w", err)
 	}
+	return nil
+}
 
+func (p *Printer) Initialize() error {
+	err := p.WriteRaw([]byte{ESC, '@'})
+	if err != nil {
+		return fmt.Errorf("could not initialize printer: %w", err)
+	}
 	return nil
 }
 
 func (p *Printer) Print(s string) error {
-	err := p.write([]byte(s))
+	err := p.WriteRaw([]byte(s))
 	if err != nil {
 		return fmt.Errorf("could not print %q: %w", s, err)
 	}
@@ -40,7 +49,7 @@ func (p *Printer) Print(s string) error {
 }
 
 func (p *Printer) Println(s string) error {
-	return p.Print(s + LF)
+	return p.Print(s + string(rune(LF)))
 }
 
 func (p *Printer) Printf(format string, a ...any) error {
@@ -48,13 +57,13 @@ func (p *Printer) Printf(format string, a ...any) error {
 }
 
 func (p *Printer) HT() error {
-	return p.Print(HT)
+	return p.WriteRaw([]byte{HT})
 }
 
 func (p *Printer) LF() error {
-	return p.Print(LF)
+	return p.WriteRaw([]byte{LF})
 }
 
 func (p *Printer) CR() error {
-	return p.Print(CR)
+	return p.WriteRaw([]byte{CR})
 }

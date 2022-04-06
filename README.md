@@ -4,6 +4,7 @@ This is a package for writing to a HOIN POS-80-Series Thermal Printer
 
 General Commands:
 
+- [x] write raw bytes
 - [x] Print
 - [x] Printf
 - [x] Println
@@ -24,9 +25,11 @@ Programmer Manual Commands:
 - [ ] ESC - n ~ Turn underline mode on/off
 - [ ] ESC 2 ~ Select default line spacing
 - [ ] ESC 3 n ~ Set line spacing
+  - [ ] Standard Mode
+  - [ ] Page mode
 - [ ] ESC = n ~ Set peripheral device
 - [ ] ESC ? n ~ Cancel user-defined characters
-- [ ] ESC @ ~ Initialize printer
+- [X] ESC @ ~ Initialize printer
 - [ ] ESC D n1...nk NUL ~ Set horizontal tab positions
 - [ ] ESC E n ~ Turn emphasized mode on/off
 - [ ] ESC G n ~ Turn on/off double-strike mode
