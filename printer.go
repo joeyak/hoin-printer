@@ -16,7 +16,7 @@ const (
 )
 
 type Printer struct {
-	dst io.Writer
+	dst io.ReadWriter
 }
 
 func NewPrinter(dst io.ReadWriter) Printer {
@@ -44,7 +44,7 @@ func (p *Printer) Initialize() error {
 func (p *Printer) Print(a ...any) error {
 	err := p.WriteRaw([]byte(fmt.Sprint(a...)))
 	if err != nil {
-		return fmt.Errorf("could not print %v: %w", a, err)
+		return fmt.Errorf("could not print %q: %w", a, err)
 	}
 	return nil
 }
@@ -78,6 +78,8 @@ func (p *Printer) Cut() error {
 }
 
 // CutFeed cuts the paper after feeding n units
+//
+// With the HOP-E802 printer this doesn't seem to change things
 func (p *Printer) CutFeed(n int) error {
 	if n < 0 || 255 < n {
 		return fmt.Errorf("units must be between 0 and 255")
