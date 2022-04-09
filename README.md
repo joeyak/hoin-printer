@@ -55,8 +55,8 @@ Programmer Manual Commands:
 - [ ] GS B n ~ Turn white/black reverse printing mode
 - [ ] GS H n ~ Select printing position for HRI characters
 - [ ] GS L nL nH ~ Set left margin
-- [ ] GS V m ~ Select cut mode and cut paper
-- [ ] GS V m n ~ Select cut mode and cut paper
+- [x] GS V m ~ Select cut mode and cut paper
+- [x] GS V m n ~ Select cut mode and cut paper
 - [ ] GS W nL nH ~ Set printing area width
 - [ ] GS f n ~ Select font for Human Readable Interpretation (HRI) characters
 - [ ] GS h n ~ Select bar code height
