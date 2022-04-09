@@ -84,3 +84,9 @@ func (p *Printer) CutFeed(n int) error {
 	}
 	return p.WriteRaw([]byte{GS, 'V', 0, byte(n)})
 }
+
+// ResetLineSpacing sets the spacing to the default which
+// is 1/6-inch lines (approx. 4.23mm)
+func (p *Printer) ResetLineSpacing() error {
+	return p.WriteRaw([]byte{ESC, '2'})
+}

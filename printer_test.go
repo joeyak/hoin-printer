@@ -140,3 +140,12 @@ func TestCutFeed(t *testing.T) {
 		})
 	}
 }
+
+func TestResetLineSpacing(t *testing.T) {
+	buffer, printer := newPrinter()
+
+	err := printer.ResetLineSpacing()
+
+	assert.NoError(t, err)
+	assert.Equal(t, "\x1B2", buffer.String())
+}

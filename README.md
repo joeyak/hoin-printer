@@ -23,7 +23,7 @@ Programmer Manual Commands:
 - [ ] ESC & y c1 c2 [x1 d1...d(x×x1)]...[xk d1...d(y×xK)] ~ Define user defined characters
 - [ ] ESC \* m nL nH d1... dk ~ Select bit-image mode
 - [ ] ESC - n ~ Turn underline mode on/off
-- [ ] ESC 2 ~ Select default line spacing
+- [x] ESC 2 ~ Select default line spacing
 - [ ] ESC 3 n ~ Set line spacing
   - [ ] Standard Mode
   - [ ] Page mode
