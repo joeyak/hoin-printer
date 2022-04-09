@@ -24,7 +24,7 @@ Programmer Manual Commands:
 - [ ] ESC \* m nL nH d1... dk ~ Select bit-image mode
 - [ ] ESC - n ~ Turn underline mode on/off
 - [x] ESC 2 ~ Select default line spacing
-- [ ] ESC 3 n ~ Set line spacing
+- [x] ESC 3 n ~ Set line spacing
   - [ ] Standard Mode
   - [ ] Page mode
 - [ ] ESC = n ~ Set peripheral device

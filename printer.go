@@ -80,7 +80,7 @@ func (p *Printer) Cut() error {
 // CutFeed cuts the paper after feeding n units
 func (p *Printer) CutFeed(n int) error {
 	if n < 0 || 255 < n {
-		return fmt.Errorf("unites must be between 0 and 255")
+		return fmt.Errorf("units must be between 0 and 255")
 	}
 	return p.WriteRaw([]byte{GS, 'V', 0, byte(n)})
 }
@@ -89,4 +89,12 @@ func (p *Printer) CutFeed(n int) error {
 // is 1/6-inch lines (approx. 4.23mm)
 func (p *Printer) ResetLineSpacing() error {
 	return p.WriteRaw([]byte{ESC, '2'})
+}
+
+// SetLineSpacing sets the line spacing to n * v/h motion units in inches
+func (p *Printer) SetLineSpacing(n int) error {
+	if n < 0 || 255 < n {
+		return fmt.Errorf("units must be between 0 and 255")
+	}
+	return p.WriteRaw([]byte{ESC, '3', byte(n)})
 }

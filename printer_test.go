@@ -9,6 +9,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var defaultUnitsTestCase = []struct {
+	units int
+	err   bool
+}{
+	{-1, true},
+	{0, false},
+	{1, false},
+	{100, false},
+	{255, false},
+	{256, true},
+}
+
 func newPrinter() (*bytes.Buffer, hoin.Printer) {
 	buffer := &bytes.Buffer{}
 	return buffer, hoin.NewPrinter(buffer)
@@ -112,19 +124,7 @@ func TestCut(t *testing.T) {
 }
 
 func TestCutFeed(t *testing.T) {
-	testCases := []struct {
-		units int
-		err   bool
-	}{
-		{-1, true},
-		{0, false},
-		{1, false},
-		{100, false},
-		{255, false},
-		{256, true},
-	}
-
-	for _, tc := range testCases {
+	for _, tc := range defaultUnitsTestCase {
 		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
 			buffer, printer := newPrinter()
 
@@ -132,7 +132,6 @@ func TestCutFeed(t *testing.T) {
 
 			if tc.err {
 				assert.Error(t, err)
-
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, []byte{0x1D, 'V', 0x00, byte(tc.units)}, buffer.Bytes()[buffer.Len()-4:])
@@ -148,4 +147,21 @@ func TestResetLineSpacing(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, "\x1B2", buffer.String())
+}
+
+func TestSetLineSpacing(t *testing.T) {
+	for _, tc := range defaultUnitsTestCase {
+		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.SetLineSpacing(tc.units)
+
+			if tc.err {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, []byte{0x1B, '3', byte(tc.units)}, buffer.Bytes())
+			}
+		})
+	}
 }
