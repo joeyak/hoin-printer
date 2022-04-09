@@ -75,3 +75,4 @@ Programmer Manual Commands:
 Undocumented?:
 
 - [ ] GS P ~ Specify horizontal and vertical units
+- [ ] GS A ~ auto status back
