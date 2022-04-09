@@ -40,16 +40,16 @@ func (p *Printer) Initialize() error {
 	return nil
 }
 
-func (p *Printer) Print(s string) error {
-	err := p.WriteRaw([]byte(s))
+func (p *Printer) Print(a ...any) error {
+	err := p.WriteRaw([]byte(fmt.Sprint(a...)))
 	if err != nil {
-		return fmt.Errorf("could not print %q: %w", s, err)
+		return fmt.Errorf("could not print %v: %w", a, err)
 	}
 	return nil
 }
 
-func (p *Printer) Println(s string) error {
-	return p.Print(s + string(rune(LF)))
+func (p *Printer) Println(a ...any) error {
+	return p.Print(fmt.Sprint(a...) + string(rune(LF)))
 }
 
 func (p *Printer) Printf(format string, a ...any) error {

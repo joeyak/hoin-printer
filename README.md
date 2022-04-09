@@ -71,3 +71,7 @@ Programmer Manual Commands:
 - [ ] FS 2 c1 c2 d1...dk ~ Define user-defined Kanji characters
 - [ ] FS S n1 n2 ~ Set left- and right-side Kanji character spacing
 - [ ] FS W n ~ Turn quadruple-size mode on/off for Kanji characters
+
+Undocumented?:
+
+- [ ] GS P ~ Specify horizontal and vertical units
