@@ -235,3 +235,22 @@ func (p Printer) SetBold(b bool) error {
 
 	return nil
 }
+
+// SetFont changes the font
+//
+// n=0 selects font A
+// n=1 selects font B
+func (p Printer) SetFont(n int) error {
+	errMsg := "could not set font: %w"
+
+	if !(n == 0 || n == 1) {
+		return fmt.Errorf(errMsg, fmt.Errorf("n must be 0 or 1"))
+	}
+
+	_, err := p.Write([]byte{ESC, 'M', byte(n)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	return nil
+}

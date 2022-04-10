@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var defaultUnitsTestCase = []struct {
+var defaultUnitsTestCases = []struct {
 	units int
 	err   bool
 }{
@@ -166,7 +166,7 @@ func TestResetLineSpacing(t *testing.T) {
 }
 
 func TestSetLineSpacing(t *testing.T) {
-	for _, tc := range defaultUnitsTestCase {
+	for _, tc := range defaultUnitsTestCases {
 		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
 			buffer, printer := newPrinter()
 
@@ -183,7 +183,7 @@ func TestSetLineSpacing(t *testing.T) {
 }
 
 func TestFeed(t *testing.T) {
-	for _, tc := range defaultUnitsTestCase {
+	for _, tc := range defaultUnitsTestCases {
 		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
 			buffer, printer := newPrinter()
 
@@ -200,7 +200,7 @@ func TestFeed(t *testing.T) {
 }
 
 func TestFeedLines(t *testing.T) {
-	for _, tc := range defaultUnitsTestCase {
+	for _, tc := range defaultUnitsTestCases {
 		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
 			buffer, printer := newPrinter()
 
@@ -272,6 +272,31 @@ func TestSetBold(t *testing.T) {
 
 			assert.NoError(t, err)
 			assert.Equal(t, []byte{0x1B, 'E', tc.output}, buffer.Bytes())
+		})
+	}
+}
+
+func TestSetFont(t *testing.T) {
+	for _, i := range []int{0, 1} {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.SetFont(i)
+
+			assert.NoError(t, err)
+			assert.Equal(t, []byte{0x1B, 'M', byte(i)}, buffer.Bytes())
+		})
+	}
+}
+
+func TestSetFontErr(t *testing.T) {
+	for _, i := range []int{-1, 2, 3} {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			_, printer := newPrinter()
+
+			err := printer.SetFont(i)
+
+			assert.Error(t, err)
 		})
 	}
 }

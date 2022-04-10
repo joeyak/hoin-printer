@@ -36,13 +36,17 @@ Programmer Manual Commands:
 - [X] ESC @ ~ Initialize printer
   - Initialize()
 - [x] ESC D n1...nk NUL ~ Set horizontal tab positions
+  - SetHT
 - [x] ESC E n ~ Turn emphasized mode on/off
-- [ ] ESC G n ~ Turn on/off double-strike mode
+  - SetBold
+- [x] ESC G n ~ Turn on/off double-strike mode
+  - Same as ESC E n
 - [x] ESC J n ~ Print and feed paper
   - Feed()
   - 100 units is 1/2 inch or 12mm
   - 1 unit is 6 typography points
-- [ ] ESC M n ~ Select character font
+- [x] ESC M n ~ Select character font
+  - SetFont()
 - [ ] ESC V n ~ Turn 90 degress clockwise rotation mode on/off
 - [ ] ESC Z m n k dL dH d1...dn ~ print qr.code
 - [ ] ESC \\ nL nH ~ Set relative print position
