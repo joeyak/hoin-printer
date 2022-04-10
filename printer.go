@@ -32,7 +32,7 @@ func NewPrinter(dst io.ReadWriter) Printer {
 	}
 }
 
-func (p *Printer) Write(b []byte) (int, error) {
+func (p Printer) Write(b []byte) (int, error) {
 	n, err := p.dst.Write(b)
 	if err != nil {
 		return n, fmt.Errorf("could not write to printer: %w", err)
@@ -40,7 +40,7 @@ func (p *Printer) Write(b []byte) (int, error) {
 	return n, nil
 }
 
-func (p *Printer) Read(b []byte) (int, error) {
+func (p Printer) Read(b []byte) (int, error) {
 	n, err := p.dst.Read(b)
 	if err != nil {
 		return n, fmt.Errorf("could not read from printer: %w", err)
@@ -48,7 +48,7 @@ func (p *Printer) Read(b []byte) (int, error) {
 	return n, nil
 }
 
-func (p *Printer) Initialize() error {
+func (p Printer) Initialize() error {
 	_, err := p.Write([]byte{ESC, '@'})
 	if err != nil {
 		return fmt.Errorf("could not initialize printer: %w", err)
@@ -56,7 +56,7 @@ func (p *Printer) Initialize() error {
 	return nil
 }
 
-func (p *Printer) Print(a ...any) error {
+func (p Printer) Print(a ...any) error {
 	_, err := p.Write([]byte(fmt.Sprint(a...)))
 	if err != nil {
 		return fmt.Errorf("could not print %q: %w", a, err)
@@ -64,18 +64,18 @@ func (p *Printer) Print(a ...any) error {
 	return nil
 }
 
-func (p *Printer) Println(a ...any) error {
+func (p Printer) Println(a ...any) error {
 	return p.Print(fmt.Sprint(a...) + string(rune(LF)))
 }
 
-func (p *Printer) Printf(format string, a ...any) error {
+func (p Printer) Printf(format string, a ...any) error {
 	return p.Print(fmt.Sprintf(format, a...))
 }
 
 // HT moves the print position to the next horizontal tab position
 //
 // By default HT will do nothing if SetHT is not called with tab positions
-func (p *Printer) HT() error {
+func (p Printer) HT() error {
 	_, err := p.Write([]byte{HT})
 	if err != nil {
 		return fmt.Errorf("could not send HT: %w", err)
@@ -84,7 +84,7 @@ func (p *Printer) HT() error {
 }
 
 // LF prints the data in the print buffer and feeds one line
-func (p *Printer) LF() error {
+func (p Printer) LF() error {
 	_, err := p.Write([]byte{LF})
 	if err != nil {
 		return fmt.Errorf("could not send LF: %w", err)
@@ -93,7 +93,7 @@ func (p *Printer) LF() error {
 }
 
 // CR prints and does a carriage return
-func (p *Printer) CR() error {
+func (p Printer) CR() error {
 	_, err := p.Write([]byte{CR})
 	if err != nil {
 		return fmt.Errorf("could not send CR: %w", err)
@@ -102,7 +102,7 @@ func (p *Printer) CR() error {
 }
 
 // Cut cuts the paper
-func (p *Printer) Cut() error {
+func (p Printer) Cut() error {
 	_, err := p.Write([]byte{GS, 'V', 0})
 	if err != nil {
 		return fmt.Errorf("could not cut paper: %w", err)
@@ -111,7 +111,7 @@ func (p *Printer) Cut() error {
 }
 
 // CutFeed feeds the paper n units and then cuts it
-func (p *Printer) CutFeed(n int) error {
+func (p Printer) CutFeed(n int) error {
 	errMsg := "could not feed and cut the paper: %w"
 
 	err := checkRange(n, 0, 255, "n")
@@ -128,7 +128,7 @@ func (p *Printer) CutFeed(n int) error {
 
 // ResetLineSpacing sets the spacing to the default which
 // is 1/6-inch lines (approx. 4.23mm)
-func (p *Printer) ResetLineSpacing() error {
+func (p Printer) ResetLineSpacing() error {
 	_, err := p.Write([]byte{ESC, '2'})
 	if err != nil {
 		return fmt.Errorf("could not reset line spacing: %w", err)
@@ -137,7 +137,7 @@ func (p *Printer) ResetLineSpacing() error {
 }
 
 // SetLineSpacing sets the line spacing to n * v/h motion units in inches
-func (p *Printer) SetLineSpacing(n int) error {
+func (p Printer) SetLineSpacing(n int) error {
 	errMsg := "could not set line spacing: %w"
 
 	err := checkRange(n, 0, 255, "n")
@@ -154,7 +154,7 @@ func (p *Printer) SetLineSpacing(n int) error {
 }
 
 // Feed feeds the paper n units
-func (p *Printer) Feed(n int) error {
+func (p Printer) Feed(n int) error {
 	errMsg := "could not feed paper: %w"
 
 	err := checkRange(n, 0, 255, "n")
@@ -171,7 +171,7 @@ func (p *Printer) Feed(n int) error {
 }
 
 // FeedLines feeds the paper n lines
-func (p *Printer) FeedLines(n int) error {
+func (p Printer) FeedLines(n int) error {
 	errMsg := "could not feed lines: %w"
 
 	err := checkRange(n, 0, 255, "n")
@@ -193,7 +193,7 @@ func (p *Printer) FeedLines(n int) error {
 // Multiple positions can be set for tabbing
 // A max of 32 positions can be set
 // Calling SetHT with no argments resets the tab positions
-func (p *Printer) SetHT(positions ...int) error {
+func (p Printer) SetHT(positions ...int) error {
 	errMsg := "could not set horizontal tab positions: %w"
 
 	if len(positions) > 32 {
