@@ -62,15 +62,31 @@ func TestInitialize(t *testing.T) {
 	assert.Equal(t, []byte{hoin.ESC, '@'}, buffer.Bytes())
 }
 
-func FuzzWriteRaw(f *testing.F) {
+func FuzzWrite(f *testing.F) {
 	f.Add([]byte("Test"))
 	f.Fuzz(func(t *testing.T, b []byte) {
 		buffer, printer := newPrinter()
 
-		err := printer.WriteRaw(b)
+		n, err := printer.Write(b)
 
 		assert.NoError(t, err)
+		assert.Equal(t, len(b), n)
 		assert.Equal(t, string(b), buffer.String())
+	})
+}
+
+func FuzzRead(f *testing.F) {
+	f.Add([]byte("Test"), 0)
+	f.Fuzz(func(t *testing.T, b []byte, n int) {
+		buffer, printer := newPrinter()
+		buffer.Write(b)
+
+		data := make([]byte, len(b)+n)
+		n, err := printer.Read(data)
+
+		assert.NoError(t, err)
+		assert.Equal(t, len(b), n)
+		assert.Equal(t, b, data[:n])
 	})
 }
 

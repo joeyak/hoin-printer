@@ -32,16 +32,24 @@ func NewPrinter(dst io.ReadWriter) Printer {
 	}
 }
 
-func (p *Printer) WriteRaw(b []byte) error {
-	_, err := p.dst.Write(b)
+func (p *Printer) Write(b []byte) (int, error) {
+	n, err := p.dst.Write(b)
 	if err != nil {
-		return fmt.Errorf("could not write to printer: %w", err)
+		return n, fmt.Errorf("could not write to printer: %w", err)
 	}
-	return nil
+	return n, nil
+}
+
+func (p *Printer) Read(b []byte) (int, error) {
+	n, err := p.dst.Read(b)
+	if err != nil {
+		return n, fmt.Errorf("could not read from printer: %w", err)
+	}
+	return n, nil
 }
 
 func (p *Printer) Initialize() error {
-	err := p.WriteRaw([]byte{ESC, '@'})
+	_, err := p.Write([]byte{ESC, '@'})
 	if err != nil {
 		return fmt.Errorf("could not initialize printer: %w", err)
 	}
@@ -49,7 +57,7 @@ func (p *Printer) Initialize() error {
 }
 
 func (p *Printer) Print(a ...any) error {
-	err := p.WriteRaw([]byte(fmt.Sprint(a...)))
+	_, err := p.Write([]byte(fmt.Sprint(a...)))
 	if err != nil {
 		return fmt.Errorf("could not print %q: %w", a, err)
 	}
@@ -66,50 +74,97 @@ func (p *Printer) Printf(format string, a ...any) error {
 
 // HT moves the print position to the next horizontal tab position
 func (p *Printer) HT() error {
-	return p.WriteRaw([]byte{HT})
+	_, err := p.Write([]byte{HT})
+	if err != nil {
+		return fmt.Errorf("could not send HT: %w", err)
+	}
+	return nil
 }
 
 // LF prints the data in the print buffer and feeds one line
 func (p *Printer) LF() error {
-	return p.WriteRaw([]byte{LF})
+	_, err := p.Write([]byte{LF})
+	if err != nil {
+		return fmt.Errorf("could not send LF: %w", err)
+	}
+	return nil
 }
 
 // CR prints and does a carriage return
 func (p *Printer) CR() error {
-	return p.WriteRaw([]byte{CR})
+	_, err := p.Write([]byte{CR})
+	if err != nil {
+		return fmt.Errorf("could not send CR: %w", err)
+	}
+	return nil
 }
 
 // Cut cuts the paper
 func (p *Printer) Cut() error {
-	return p.WriteRaw([]byte{GS, 'V', 0})
+	_, err := p.Write([]byte{GS, 'V', 0})
+	if err != nil {
+		return fmt.Errorf("could not cut paper: %w", err)
+	}
+	return nil
 }
 
 // ResetLineSpacing sets the spacing to the default which
 // is 1/6-inch lines (approx. 4.23mm)
 func (p *Printer) ResetLineSpacing() error {
-	return p.WriteRaw([]byte{ESC, '2'})
+	_, err := p.Write([]byte{ESC, '2'})
+	if err != nil {
+		return fmt.Errorf("could not reset line spacing: %w", err)
+	}
+	return nil
 }
 
 // SetLineSpacing sets the line spacing to n * v/h motion units in inches
 func (p *Printer) SetLineSpacing(n int) error {
-	if err := checkRange(n, 0, 255, "n"); err != nil {
-		return fmt.Errorf("could not set line spacing: %w", err)
+	errMsg := "could not set line spacing: %w"
+
+	err := checkRange(n, 0, 255, "n")
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
-	return p.WriteRaw([]byte{ESC, '3', byte(n)})
+
+	_, err = p.Write([]byte{ESC, '3', byte(n)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	return err
 }
 
 // Feed feeds the paper n units
 func (p *Printer) Feed(n int) error {
-	if err := checkRange(n, 0, 255, "n"); err != nil {
-		return fmt.Errorf("could not feed paper: %w", err)
+	errMsg := "could not feed paper: %w"
+
+	err := checkRange(n, 0, 255, "n")
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
-	return p.WriteRaw([]byte{ESC, 'J', byte(n)})
+
+	_, err = p.Write([]byte{ESC, 'J', byte(n)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	return err
 }
 
 // FeedLines feeds the paper n lines
 func (p *Printer) FeedLines(n int) error {
-	if err := checkRange(n, 0, 255, "n"); err != nil {
-		return fmt.Errorf("could not feed lines: %w", err)
+	errMsg := "could not feed lines: %w"
+
+	err := checkRange(n, 0, 255, "n")
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
-	return p.WriteRaw([]byte{ESC, 'd', byte(n)})
+
+	_, err = p.Write([]byte{ESC, 'd', byte(n)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	return err
 }

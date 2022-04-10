@@ -29,11 +29,7 @@ func main() {
 		printer.Println("Hello World!")
 	}
 
-	// This is so the cut doesn't cut text in half
-	for i := 0; i < 5; i++ {
-		printer.LF()
-	}
-
+	printer.FeedLines(5)
 	printer.Cut()
 }
 ```

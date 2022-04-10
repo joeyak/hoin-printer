@@ -1,6 +1,9 @@
 General Commands:
 
 - [x] write raw bytes
+  - Write()
+- [x] read raw bytes
+  - Read()
 - [x] Print
 - [x] Printf
 - [x] Println
