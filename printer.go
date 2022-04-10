@@ -168,3 +168,36 @@ func (p *Printer) FeedLines(n int) error {
 
 	return err
 }
+
+// SetHT sets the horizontal tab positions
+//
+// This command cancels previous SetHT commands
+// Multiple positions can be set for tabbing
+// A max of 32 positions can be set
+func (p *Printer) SetHT(positions ...int) error {
+	errMsg := "could not set horizontal tab positions: %w"
+
+	if len(positions) > 32 {
+		return fmt.Errorf("more than 32 positions was set")
+	}
+
+	var data []byte
+	for i, pos := range positions {
+		err := checkRange(pos, 1, 255, fmt.Sprintf("position %d", i))
+		if err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
+
+		data = append(data, byte(pos))
+	}
+
+	data = append([]byte{ESC, 'D'}, data...)
+	data = append(data, 0)
+
+	_, err := p.Write(data)
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	return nil
+}

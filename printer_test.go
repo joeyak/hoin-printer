@@ -21,6 +21,14 @@ var defaultUnitsTestCase = []struct {
 	{256, true},
 }
 
+func convertIntsToBytes(a []int) []byte {
+	var data []byte
+	for _, b := range a {
+		data = append(data, byte(b))
+	}
+	return data
+}
+
 func newPrinter() (*bytes.Buffer, hoin.Printer) {
 	buffer := &bytes.Buffer{}
 	return buffer, hoin.NewPrinter(buffer)
@@ -195,6 +203,45 @@ func TestFeedLines(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, []byte{0x1B, 'd', byte(tc.units)}, buffer.Bytes()[buffer.Len()-3:])
 			}
+		})
+	}
+}
+
+func TestSetHTPositions(t *testing.T) {
+	testCases := [][]int{
+		{},
+		{1},
+		{4},
+		{4, 4, 4},
+	}
+
+	for _, b := range testCases {
+		t.Run(fmt.Sprint(b), func(t *testing.T) {
+			expected := convertIntsToBytes(append(append([]int{0x1B, 'D'}, b...), 0))
+			buffer, printer := newPrinter()
+
+			err := printer.SetHT(b...)
+
+			assert.NoError(t, err)
+			assert.EqualValues(t, expected, buffer.Bytes())
+		})
+	}
+}
+
+func TestSetHTPositionsError(t *testing.T) {
+	testCases := [][]int{
+		{-1},
+		{256},
+		make([]int, 256),
+	}
+
+	for _, b := range testCases {
+		t.Run(fmt.Sprint(b), func(t *testing.T) {
+			_, printer := newPrinter()
+
+			err := printer.SetHT(b...)
+
+			assert.Error(t, err)
 		})
 	}
 }
