@@ -165,3 +165,20 @@ func TestSetLineSpacing(t *testing.T) {
 		})
 	}
 }
+
+func TestFeed(t *testing.T) {
+	for _, tc := range defaultUnitsTestCase {
+		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.Feed(tc.units)
+
+			if tc.err {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, []byte{0x1B, 'J', byte(tc.units)}, buffer.Bytes()[buffer.Len()-3:])
+			}
+		})
+	}
+}

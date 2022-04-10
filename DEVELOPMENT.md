@@ -29,7 +29,7 @@ Programmer Manual Commands:
 - [ ] ESC D n1...nk NUL ~ Set horizontal tab positions
 - [ ] ESC E n ~ Turn emphasized mode on/off
 - [ ] ESC G n ~ Turn on/off double-strike mode
-- [ ] ESC J n ~ Print and feed paper
+- [x] ESC J n ~ Print and feed paper
 - [ ] ESC M n ~ Select character font
 - [ ] ESC V n ~ Turn 90 degress clockwise rotation mode on/off
 - [ ] ESC Z m n k dL dH d1...dn ~ print qr.code
