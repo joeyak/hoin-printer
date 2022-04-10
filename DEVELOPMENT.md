@@ -47,7 +47,8 @@ Programmer Manual Commands:
   - 1 unit is 6 typography points
 - [x] ESC M n ~ Select character font
   - SetFont()
-- [ ] ESC V n ~ Turn 90 degress clockwise rotation mode on/off
+- [x] ESC V n ~ Turn 90 degress clockwise rotation mode on/off
+  - SetRotate90()
 - [ ] ESC Z m n k dL dH d1...dn ~ print qr.code
 - [ ] ESC \\ nL nH ~ Set relative print position
 - [ ] ESC a n ~ Select justification

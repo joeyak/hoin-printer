@@ -9,18 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var defaultUnitsTestCases = []struct {
-	units int
-	err   bool
-}{
-	{-1, true},
-	{0, false},
-	{1, false},
-	{100, false},
-	{255, false},
-	{256, true},
-}
-
 func convertIntsToBytes(a []int) []byte {
 	var data []byte
 	for _, b := range a {
@@ -166,7 +154,19 @@ func TestResetLineSpacing(t *testing.T) {
 }
 
 func TestSetLineSpacing(t *testing.T) {
-	for _, tc := range defaultUnitsTestCases {
+	testCases := []struct {
+		units int
+		err   bool
+	}{
+		{-1, true},
+		{0, false},
+		{1, false},
+		{100, false},
+		{255, false},
+		{256, true},
+	}
+
+	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
 			buffer, printer := newPrinter()
 
@@ -183,7 +183,19 @@ func TestSetLineSpacing(t *testing.T) {
 }
 
 func TestFeed(t *testing.T) {
-	for _, tc := range defaultUnitsTestCases {
+	testCases := []struct {
+		units int
+		err   bool
+	}{
+		{-1, true},
+		{0, false},
+		{1, false},
+		{100, false},
+		{255, false},
+		{256, true},
+	}
+
+	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
 			buffer, printer := newPrinter()
 
@@ -200,7 +212,19 @@ func TestFeed(t *testing.T) {
 }
 
 func TestFeedLines(t *testing.T) {
-	for _, tc := range defaultUnitsTestCases {
+	testCases := []struct {
+		units int
+		err   bool
+	}{
+		{-1, true},
+		{0, false},
+		{1, false},
+		{100, false},
+		{255, false},
+		{256, true},
+	}
+
+	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
 			buffer, printer := newPrinter()
 
@@ -297,6 +321,27 @@ func TestSetFontErr(t *testing.T) {
 			err := printer.SetFont(i)
 
 			assert.Error(t, err)
+		})
+	}
+}
+
+func TestSetRotate90(t *testing.T) {
+	testCases := []struct {
+		input  bool
+		output byte
+	}{
+		{false, 0},
+		{true, 1},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprint(tc.input), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.SetRotate90(tc.input)
+
+			assert.NoError(t, err)
+			assert.Equal(t, []byte{0x1B, 'V', tc.output}, buffer.Bytes())
 		})
 	}
 }

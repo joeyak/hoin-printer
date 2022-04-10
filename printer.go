@@ -22,6 +22,13 @@ func checkRange(n, min, max int, info string) error {
 	return nil
 }
 
+func boolToByte(b bool) byte {
+	if b {
+		return 1
+	}
+	return 0
+}
+
 type Printer struct {
 	dst io.ReadWriter
 }
@@ -223,16 +230,18 @@ func (p Printer) SetHT(positions ...int) error {
 
 // SetBold turns emphasized mode on or off
 func (p Printer) SetBold(b bool) error {
-	var bb byte = 0
-	if b {
-		bb = 1
-	}
-
-	_, err := p.Write([]byte{ESC, 'E', bb})
+	_, err := p.Write([]byte{ESC, 'E', boolToByte(b)})
 	if err != nil {
-		return fmt.Errorf("could not set bold: %w", err)
+		return fmt.Errorf("could not set bold to %t: %w", b, err)
 	}
+	return nil
+}
 
+func (p Printer) SetRotate90(b bool) error {
+	_, err := p.Write([]byte{ESC, 'V', boolToByte(b)})
+	if err != nil {
+		return fmt.Errorf("could not set bold to %t: %w", b, err)
+	}
 	return nil
 }
 
