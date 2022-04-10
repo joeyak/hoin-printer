@@ -92,3 +92,7 @@ Undocumented?:
 
 - [ ] GS P ~ Specify horizontal and vertical units
 - [ ] GS A ~ auto status back
+- [x] ESC B n t ~ Beep
+  - Beep()
+  - n is number of beep 1 <= n <= 9
+  - t is length of beep 1 <= n <= 9

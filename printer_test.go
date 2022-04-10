@@ -345,3 +345,32 @@ func TestSetRotate90(t *testing.T) {
 		})
 	}
 }
+
+func TestBeep(t *testing.T) {
+	testCases := []struct {
+		n, t int
+		err  bool
+	}{
+		{0, 0, true},
+		{1, 0, true},
+		{0, 1, true},
+		{1, 1, false},
+		{9, 9, false},
+		{10, 10, true},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%d-%d-%t", tc.n, tc.t, tc.err), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.Beep(tc.n, tc.t)
+
+			if tc.err {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, []byte{0x1B, 'B', byte(tc.n), byte(tc.t)}, buffer.Bytes()[buffer.Len()-4:])
+			}
+		})
+	}
+}

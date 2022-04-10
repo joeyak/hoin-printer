@@ -63,6 +63,31 @@ func (p Printer) Initialize() error {
 	return nil
 }
 
+// Beep makes a beep sound n times for t duration
+//
+// Duration is dependent on the model. For the HOP-E802
+// each duration is around 100ms
+func (p Printer) Beep(n, t int) error {
+	errMsg := "could not beep the printer: %w"
+
+	err := checkRange(n, 1, 9, "n")
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	err = checkRange(t, 1, 9, "t")
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	_, err = p.Write([]byte{ESC, 'B', byte(n), byte(t)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	return nil
+}
+
 func (p Printer) Print(a ...any) error {
 	_, err := p.Write([]byte(fmt.Sprint(a...)))
 	if err != nil {
