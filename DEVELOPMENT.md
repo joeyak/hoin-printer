@@ -61,8 +61,10 @@ Programmer Manual Commands:
 - [ ] ESC C 5 n ~ Enable/disable panel buttons
 - [x] ESC d n ~ Print and feed n lines
   - FeedLines()
+- [x] GS V m ~ Select cut mode and cut paper
+  - Cut()
 - [x] GS V m n ~ Select cut mode and cut paper
-  - In testing it didn't do anything
+  - CutFeed()
 - [ ] ESC p m t1 t2 ~ Generate pulse
 - [ ] ESC t n ~ Select character code table
 - [ ] ESC { n ~ Turns on/off upside-down printing mode
