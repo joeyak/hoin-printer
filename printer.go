@@ -12,7 +12,6 @@ const (
 	GS  = 0x1D
 	ESC = 0x1B
 	DLE = 0x10
-	EOT = 0x04
 )
 
 func checkRange(n, min, max int, info string) error {

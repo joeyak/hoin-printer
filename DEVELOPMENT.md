@@ -16,7 +16,11 @@ Programmer Manual Commands:
   - LF()
 - [x] CR ~ Print and carriage return
   - CR()
-- [ ] DLE EOT n ~ Real-time status transmission
+- [x] DLE EOT n ~ Real-time status transmission
+  - TransmitPrinterStatus()
+  - TransmitOfflineStatus()
+  - TransmitErrorStatus()
+  - TransmitPaperSensorStatus()
 - [ ] DLE DC4 n m t ~ Generate pulse at real-time
 - [ ] ESC SP n ~ Set right-side character spacing
 - [ ] ESC ! n ~ Select print mode(s)
