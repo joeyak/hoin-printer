@@ -40,6 +40,8 @@ Programmer Manual Commands:
 - [ ] ESC G n ~ Turn on/off double-strike mode
 - [x] ESC J n ~ Print and feed paper
   - Feed()
+  - 100 units is 1/2 inch or 12mm
+  - 1 unit is 6 typography points
 - [ ] ESC M n ~ Select character font
 - [ ] ESC V n ~ Turn 90 degress clockwise rotation mode on/off
 - [ ] ESC Z m n k dL dH d1...dn ~ print qr.code
@@ -50,6 +52,8 @@ Programmer Manual Commands:
 - [ ] ESC C 5 n ~ Enable/disable panel buttons
 - [x] ESC d n ~ Print and feed n lines
   - FeedLines()
+- [x] GS V m n ~ Select cut mode and cut paper
+  - In testing it didn't do anything
 - [ ] ESC p m t1 t2 ~ Generate pulse
 - [ ] ESC t n ~ Select character code table
 - [ ] ESC { n ~ Turns on/off upside-down printing mode
@@ -83,7 +87,3 @@ Undocumented?:
 
 - [ ] GS P ~ Specify horizontal and vertical units
 - [ ] GS A ~ auto status back
-
-Not Implemented:
-- [x] GS V m n ~ Select cut mode and cut paper
-  - In testing it didn't do anything

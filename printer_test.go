@@ -147,6 +147,15 @@ func TestCut(t *testing.T) {
 	assert.Equal(t, "\x1DV\x00", buffer.String())
 }
 
+func TestCutFeed(t *testing.T) {
+	buffer, printer := newPrinter()
+
+	err := printer.CutFeed(5)
+
+	assert.NoError(t, err)
+	assert.Equal(t, "\x1DV\x42\x05", buffer.String())
+}
+
 func TestResetLineSpacing(t *testing.T) {
 	buffer, printer := newPrinter()
 

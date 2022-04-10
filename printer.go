@@ -73,6 +73,8 @@ func (p *Printer) Printf(format string, a ...any) error {
 }
 
 // HT moves the print position to the next horizontal tab position
+//
+// By default HT will do nothing if SetHT is not called with tab positions
 func (p *Printer) HT() error {
 	_, err := p.Write([]byte{HT})
 	if err != nil {
@@ -104,6 +106,22 @@ func (p *Printer) Cut() error {
 	_, err := p.Write([]byte{GS, 'V', 0})
 	if err != nil {
 		return fmt.Errorf("could not cut paper: %w", err)
+	}
+	return nil
+}
+
+// CutFeed feeds the paper n units and then cuts it
+func (p *Printer) CutFeed(n int) error {
+	errMsg := "could not feed and cut the paper: %w"
+
+	err := checkRange(n, 0, 255, "n")
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	_, err = p.Write([]byte{GS, 'V', 66, byte(n)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
 	return nil
 }
@@ -174,6 +192,7 @@ func (p *Printer) FeedLines(n int) error {
 // This command cancels previous SetHT commands
 // Multiple positions can be set for tabbing
 // A max of 32 positions can be set
+// Calling SetHT with no argments resets the tab positions
 func (p *Printer) SetHT(positions ...int) error {
 	errMsg := "could not set horizontal tab positions: %w"
 
