@@ -36,7 +36,7 @@ Programmer Manual Commands:
 - [X] ESC @ ~ Initialize printer
   - Initialize()
 - [x] ESC D n1...nk NUL ~ Set horizontal tab positions
-- [ ] ESC E n ~ Turn emphasized mode on/off
+- [x] ESC E n ~ Turn emphasized mode on/off
 - [ ] ESC G n ~ Turn on/off double-strike mode
 - [x] ESC J n ~ Print and feed paper
   - Feed()

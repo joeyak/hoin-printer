@@ -220,3 +220,18 @@ func (p Printer) SetHT(positions ...int) error {
 
 	return nil
 }
+
+// SetBold turns emphasized mode on or off
+func (p Printer) SetBold(b bool) error {
+	var bb byte = 0
+	if b {
+		bb = 1
+	}
+
+	_, err := p.Write([]byte{ESC, 'E', bb})
+	if err != nil {
+		return fmt.Errorf("could not set bold: %w", err)
+	}
+
+	return nil
+}

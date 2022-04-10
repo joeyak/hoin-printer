@@ -254,3 +254,24 @@ func TestSetHTPositionsError(t *testing.T) {
 		})
 	}
 }
+
+func TestSetBold(t *testing.T) {
+	testCases := []struct {
+		input  bool
+		output byte
+	}{
+		{false, 0},
+		{true, 1},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprint(tc.input), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.SetBold(tc.input)
+
+			assert.NoError(t, err)
+			assert.Equal(t, []byte{0x1B, 'E', tc.output}, buffer.Bytes())
+		})
+	}
+}
