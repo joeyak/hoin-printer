@@ -84,16 +84,6 @@ func (p *Printer) Cut() error {
 	return p.WriteRaw([]byte{GS, 'V', 0})
 }
 
-// CutFeed cuts the paper after feeding n units
-//
-// With the HOP-E802 printer this doesn't seem to change things
-func (p *Printer) CutFeed(n int) error {
-	if err := checkRange(n, 0, 255, "n"); err != nil {
-		return fmt.Errorf("could not cut feed: %w", err)
-	}
-	return p.WriteRaw([]byte{GS, 'V', 0, byte(n)})
-}
-
 // ResetLineSpacing sets the spacing to the default which
 // is 1/6-inch lines (approx. 4.23mm)
 func (p *Printer) ResetLineSpacing() error {

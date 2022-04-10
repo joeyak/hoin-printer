@@ -8,8 +8,11 @@ General Commands:
 Programmer Manual Commands:
 
 - [x] HT ~ Horizontal Tab
+  - HT()
 - [x] LF ~ Print and line feed
+  - LF()
 - [x] CR ~ Print and carriage return
+  - CR()
 - [ ] DLE EOT n ~ Real-time status transmission
 - [ ] DLE DC4 n m t ~ Generate pulse at real-time
 - [ ] ESC SP n ~ Set right-side character spacing
@@ -20,16 +23,20 @@ Programmer Manual Commands:
 - [ ] ESC \* m nL nH d1... dk ~ Select bit-image mode
 - [ ] ESC - n ~ Turn underline mode on/off
 - [x] ESC 2 ~ Select default line spacing
+  - ResetLineSpacing()
 - [x] ESC 3 n ~ Set line spacing
+  - SetLineSpacing()
   - [ ] Standard Mode
   - [ ] Page mode
 - [ ] ESC = n ~ Set peripheral device
 - [ ] ESC ? n ~ Cancel user-defined characters
 - [X] ESC @ ~ Initialize printer
+  - Initialize()
 - [ ] ESC D n1...nk NUL ~ Set horizontal tab positions
 - [ ] ESC E n ~ Turn emphasized mode on/off
 - [ ] ESC G n ~ Turn on/off double-strike mode
 - [x] ESC J n ~ Print and feed paper
+  - Feed()
 - [ ] ESC M n ~ Select character font
 - [ ] ESC V n ~ Turn 90 degress clockwise rotation mode on/off
 - [ ] ESC Z m n k dL dH d1...dn ~ print qr.code
@@ -39,6 +46,7 @@ Programmer Manual Commands:
 - [ ] ESC c 4 n (\*) ~ Select paper sensor(s) to stop printing
 - [ ] ESC C 5 n ~ Enable/disable panel buttons
 - [x] ESC d n ~ Print and feed n lines
+  - FeedLines()
 - [ ] ESC p m t1 t2 ~ Generate pulse
 - [ ] ESC t n ~ Select character code table
 - [ ] ESC { n ~ Turns on/off upside-down printing mode
@@ -52,7 +60,7 @@ Programmer Manual Commands:
 - [ ] GS H n ~ Select printing position for HRI characters
 - [ ] GS L nL nH ~ Set left margin
 - [x] GS V m ~ Select cut mode and cut paper
-- [x] GS V m n ~ Select cut mode and cut paper
+  - Cut()
 - [ ] GS W nL nH ~ Set printing area width
 - [ ] GS f n ~ Select font for Human Readable Interpretation (HRI) characters
 - [ ] GS h n ~ Select bar code height
@@ -72,3 +80,7 @@ Undocumented?:
 
 - [ ] GS P ~ Specify horizontal and vertical units
 - [ ] GS A ~ auto status back
+
+Not Implemented:
+- [x] GS V m n ~ Select cut mode and cut paper
+  - In testing it didn't do anything

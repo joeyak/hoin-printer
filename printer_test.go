@@ -123,23 +123,6 @@ func TestCut(t *testing.T) {
 	assert.Equal(t, "\x1DV\x00", buffer.String())
 }
 
-func TestCutFeed(t *testing.T) {
-	for _, tc := range defaultUnitsTestCase {
-		t.Run(fmt.Sprintf("%d:%t", tc.units, tc.err), func(t *testing.T) {
-			buffer, printer := newPrinter()
-
-			err := printer.CutFeed(tc.units)
-
-			if tc.err {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, []byte{0x1D, 'V', 0x00, byte(tc.units)}, buffer.Bytes()[buffer.Len()-4:])
-			}
-		})
-	}
-}
-
 func TestResetLineSpacing(t *testing.T) {
 	buffer, printer := newPrinter()
 
