@@ -38,7 +38,7 @@ Programmer Manual Commands:
 - [ ] ESC c 3 n (\*) ~ Select paper sensor(s) to output paper end signals
 - [ ] ESC c 4 n (\*) ~ Select paper sensor(s) to stop printing
 - [ ] ESC C 5 n ~ Enable/disable panel buttons
-- [ ] ESC d n ~ Print and feed n lines
+- [x] ESC d n ~ Print and feed n lines
 - [ ] ESC p m t1 t2 ~ Generate pulse
 - [ ] ESC t n ~ Select character code table
 - [ ] ESC { n ~ Turns on/off upside-down printing mode

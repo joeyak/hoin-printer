@@ -15,9 +15,9 @@ const (
 	EOT = 0x04
 )
 
-func checkUnits(n int) error {
-	if n < 0 || 255 < n {
-		return fmt.Errorf("units must be between 0 and 255")
+func checkRange(n, min, max int, info string) error {
+	if n < min || max < n {
+		return fmt.Errorf("%s must be between %d and %d", info, min, max)
 	}
 	return nil
 }
@@ -88,7 +88,7 @@ func (p *Printer) Cut() error {
 //
 // With the HOP-E802 printer this doesn't seem to change things
 func (p *Printer) CutFeed(n int) error {
-	if err := checkUnits(n); err != nil {
+	if err := checkRange(n, 0, 255, "n"); err != nil {
 		return fmt.Errorf("could not cut feed: %w", err)
 	}
 	return p.WriteRaw([]byte{GS, 'V', 0, byte(n)})
@@ -102,7 +102,7 @@ func (p *Printer) ResetLineSpacing() error {
 
 // SetLineSpacing sets the line spacing to n * v/h motion units in inches
 func (p *Printer) SetLineSpacing(n int) error {
-	if err := checkUnits(n); err != nil {
+	if err := checkRange(n, 0, 255, "n"); err != nil {
 		return fmt.Errorf("could not set line spacing: %w", err)
 	}
 	return p.WriteRaw([]byte{ESC, '3', byte(n)})
@@ -110,8 +110,16 @@ func (p *Printer) SetLineSpacing(n int) error {
 
 // Feed feeds the paper n units
 func (p *Printer) Feed(n int) error {
-	if err := checkUnits(n); err != nil {
+	if err := checkRange(n, 0, 255, "n"); err != nil {
 		return fmt.Errorf("could not feed paper: %w", err)
 	}
 	return p.WriteRaw([]byte{ESC, 'J', byte(n)})
+}
+
+// FeedLines feeds the paper n lines
+func (p *Printer) FeedLines(n int) error {
+	if err := checkRange(n, 0, 255, "n"); err != nil {
+		return fmt.Errorf("could not feed lines: %w", err)
+	}
+	return p.WriteRaw([]byte{ESC, 'd', byte(n)})
 }
