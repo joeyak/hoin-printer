@@ -14,6 +14,14 @@ const (
 	DLE = 0x10
 )
 
+type Justification byte
+
+const (
+	Left   Justification = 0
+	Center Justification = 1
+	Right  Justification = 2
+)
+
 func checkRange(n, min, max int, info string) error {
 	if n < min || max < n {
 		return fmt.Errorf("%s must be between %d and %d", info, min, max)
@@ -285,5 +293,14 @@ func (p Printer) SetFont(n int) error {
 		return fmt.Errorf(errMsg, err)
 	}
 
+	return nil
+}
+
+// Justify sets the alignment to n
+func (p Printer) Justify(j Justification) error {
+	_, err := p.Write([]byte{ESC, 'a', byte(j)})
+	if err != nil {
+		return fmt.Errorf("could not justify: %w", err)
+	}
 	return nil
 }

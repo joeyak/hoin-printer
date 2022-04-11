@@ -374,3 +374,16 @@ func TestBeep(t *testing.T) {
 		})
 	}
 }
+
+func TestJustify(t *testing.T) {
+	for _, j := range []hoin.Justification{hoin.Left, hoin.Center, hoin.Right} {
+		t.Run(fmt.Sprint(j), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.Justify(j)
+
+			assert.NoError(t, err)
+			assert.Equal(t, []byte{0x1B, 'a', byte(j)}, buffer.Bytes())
+		})
+	}
+}

@@ -55,7 +55,8 @@ Programmer Manual Commands:
   - SetRotate90()
 - [ ] ESC Z m n k dL dH d1...dn ~ print qr.code
 - [ ] ESC \\ nL nH ~ Set relative print position
-- [ ] ESC a n ~ Select justification
+- [x] ESC a n ~ Select justification
+  - Justify()
 - [ ] ESC c 3 n (\*) ~ Select paper sensor(s) to output paper end signals
 - [ ] ESC c 4 n (\*) ~ Select paper sensor(s) to stop printing
 - [ ] ESC C 5 n ~ Enable/disable panel buttons
