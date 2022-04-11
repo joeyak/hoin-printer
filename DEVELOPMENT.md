@@ -72,7 +72,7 @@ Programmer Manual Commands:
 - [ ] FS q n [xL xH yL yH d1...dk]<sub>1</sub>...[xL xH yL yH d1...dk]<sub>n</sub> ~ Define NV bit image
 - [ ] GS ! n ~ Select character size
 - [ ] GS $ nL nH ~ Set absolute vertical print position in page mode
-- [ ] GS \* x y d1...d(xxyx8) ~ Define downloaded bit image
+- [ ] GS \* x y d1...d(x×y×8) ~ Define downloaded bit image
 - [ ] GS / m ~ Print downloaded bit image
 - [ ] GS B n ~ Turn white/black reverse printing mode
 - [ ] GS H n ~ Select printing position for HRI characters
