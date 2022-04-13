@@ -75,7 +75,7 @@ Programmer Manual Commands:
 - [ ] GS $ nL nH ~ Set absolute vertical print position in page mode
 - [ ] GS \* x y d1...d(x×y×8) ~ Define downloaded bit image
 - [ ] GS / m ~ Print downloaded bit image
-- [ ] GS B n ~ Turn white/black reverse printing mode
+- [x] GS B n ~ Turn white/black reverse printing mode
 - [ ] GS H n ~ Select printing position for HRI characters
 - [ ] GS L nL nH ~ Set left margin
 - [x] GS V m ~ Select cut mode and cut paper

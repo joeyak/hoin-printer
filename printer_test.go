@@ -346,6 +346,27 @@ func TestSetRotate90(t *testing.T) {
 	}
 }
 
+func TestSetReversePrinting(t *testing.T) {
+	testCases := []struct {
+		input  bool
+		output byte
+	}{
+		{false, 0},
+		{true, 1},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprint(tc.input), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.SetReversePrinting(tc.input)
+
+			assert.NoError(t, err)
+			assert.Equal(t, []byte{0x1D, 'B', tc.output}, buffer.Bytes())
+		})
+	}
+}
+
 func TestBeep(t *testing.T) {
 	testCases := []struct {
 		n, t int

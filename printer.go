@@ -269,10 +269,25 @@ func (p Printer) SetBold(b bool) error {
 	return nil
 }
 
+// SetRotate90 turns on 90 clockwise rotation mode for the text
+//
+// When text is double-width or double-height the text will be mirrored
 func (p Printer) SetRotate90(b bool) error {
 	_, err := p.Write([]byte{ESC, 'V', boolToByte(b)})
 	if err != nil {
 		return fmt.Errorf("could not set bold to %t: %w", b, err)
+	}
+	return nil
+}
+
+// SetReversePrinting sets the white/black printing mode
+//
+// If b is true then it will print black text on white background
+// If b is false then it will print white text on black background
+func (p Printer) SetReversePrinting(b bool) error {
+	_, err := p.Write([]byte{GS, 'B', boolToByte(b)})
+	if err != nil {
+		return fmt.Errorf("could not set reverse printing mode: %w", err)
 	}
 	return nil
 }
