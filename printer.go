@@ -17,9 +17,18 @@ const (
 type Justification byte
 
 const (
-	Left   Justification = 0
-	Center Justification = 1
-	Right  Justification = 2
+	JLeft Justification = iota
+	JCenter
+	JRight
+)
+
+type HRIPosition byte
+
+const (
+	HNone HRIPosition = iota
+	HAbove
+	HBelow
+	HBoth
 )
 
 func checkRange(n, min, max int, info string) error {
@@ -316,6 +325,16 @@ func (p Printer) Justify(j Justification) error {
 	_, err := p.Write([]byte{ESC, 'a', byte(j)})
 	if err != nil {
 		return fmt.Errorf("could not justify: %w", err)
+	}
+	return nil
+}
+
+// SetHRIPosition sets the printing position of the HRI characters
+// in relation to the barcode
+func (p Printer) SetHRIPosition(hp HRIPosition) error {
+	_, err := p.Write([]byte{GS, 'H', byte(hp)})
+	if err != nil {
+		return fmt.Errorf("could not set HRI position: %w", err)
 	}
 	return nil
 }
