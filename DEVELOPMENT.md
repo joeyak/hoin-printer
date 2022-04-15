@@ -54,7 +54,7 @@ Programmer Manual Commands:
 - [x] ESC V n ~ Turn 90 degress clockwise rotation mode on/off
   - SetRotate90()
 - [ ] ESC Z m n k dL dH d1...dn ~ print qr.code
-- [ ] ESC \\ nL nH ~ Set relative print position
+- [x] ESC \\ nL nH ~ Set relative print position
 - [x] ESC a n ~ Select justification
   - Justify()
 - [ ] ESC c 3 n (\*) ~ Select paper sensor(s) to output paper end signals
@@ -75,8 +75,8 @@ Programmer Manual Commands:
 - [ ] GS $ nL nH ~ Set absolute vertical print position in page mode
 - [ ] GS \* x y d1...d(x×y×8) ~ Define downloaded bit image
 - [ ] GS / m ~ Print downloaded bit image
-- [ ] GS B n ~ Turn white/black reverse printing mode
-- [ ] GS H n ~ Select printing position for HRI characters
+- [x] GS B n ~ Turn white/black reverse printing mode
+- [x] GS H n ~ Select printing position for HRI characters
 - [ ] GS L nL nH ~ Set left margin
 - [x] GS V m ~ Select cut mode and cut paper
   - Cut()

@@ -346,6 +346,27 @@ func TestSetRotate90(t *testing.T) {
 	}
 }
 
+func TestSetReversePrinting(t *testing.T) {
+	testCases := []struct {
+		input  bool
+		output byte
+	}{
+		{false, 0},
+		{true, 1},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprint(tc.input), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.SetReversePrinting(tc.input)
+
+			assert.NoError(t, err)
+			assert.Equal(t, []byte{0x1D, 'B', tc.output}, buffer.Bytes())
+		})
+	}
+}
+
 func TestBeep(t *testing.T) {
 	testCases := []struct {
 		n, t int
@@ -376,7 +397,7 @@ func TestBeep(t *testing.T) {
 }
 
 func TestJustify(t *testing.T) {
-	for _, j := range []hoin.Justification{hoin.Left, hoin.Center, hoin.Right} {
+	for _, j := range []hoin.Justification{hoin.JLeft, hoin.JCenter, hoin.JRight} {
 		t.Run(fmt.Sprint(j), func(t *testing.T) {
 			buffer, printer := newPrinter()
 
@@ -384,6 +405,19 @@ func TestJustify(t *testing.T) {
 
 			assert.NoError(t, err)
 			assert.Equal(t, []byte{0x1B, 'a', byte(j)}, buffer.Bytes())
+		})
+	}
+}
+
+func TestSetHRIPosition(t *testing.T) {
+	for _, hp := range []hoin.HRIPosition{hoin.HNone, hoin.HAbove, hoin.HBelow, hoin.HBoth} {
+		t.Run(fmt.Sprint(hp), func(t *testing.T) {
+			buffer, printer := newPrinter()
+
+			err := printer.SetHRIPosition(hp)
+
+			assert.NoError(t, err)
+			assert.Equal(t, []byte{0x1D, 'H', byte(hp)}, buffer.Bytes())
 		})
 	}
 }
