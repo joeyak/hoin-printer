@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 	"io"
-	"time"
 )
 
 const (
@@ -481,7 +480,11 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 		// stop printing part of the way through an image.  This will also
 		// lose any commands sent after the image.  Sleeping for 35ms seems to
 		// be the best balance between not printing and reducing banding.
-		time.Sleep(time.Millisecond * 35)
+		// time.Sleep(time.Millisecond * 35)
+
+		// Leaving above there just in case below is a footgun, but below should
+		// wait till print buffer is done to write more lines
+		p.TransmitErrorStatus()
 	}
 
 	return nil
