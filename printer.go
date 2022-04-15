@@ -2,7 +2,10 @@ package hoin
 
 import (
 	"fmt"
+	"image"
+	"image/color"
 	"io"
+	"time"
 )
 
 const (
@@ -17,19 +20,38 @@ const (
 type Justification byte
 
 const (
-	JLeft Justification = iota
-	JCenter
-	JRight
+	LeftJustify Justification = iota
+	CenterJustify
+	RightJustify
 )
 
 type HRIPosition byte
 
 const (
-	HNone HRIPosition = iota
-	HAbove
-	HBelow
-	HBoth
+	HRINone HRIPosition = iota
+	HRIAbove
+	HRIBelow
+	HRIBoth
 )
+
+// Density represents the DPI to use when printing images.
+type Density byte
+
+const (
+	// SingleDensity is 90dpi
+	SingleDensity Density = iota
+	// DoubleDensity is 180dpi
+	DoubleDensity
+)
+
+func checkEnum[T ~byte](e T, enums ...T) error {
+	for _, en := range enums {
+		if e == en {
+			return nil
+		}
+	}
+	return fmt.Errorf("%v was not a valid choice from %v", e, enums)
+}
 
 func checkRange(n, min, max int, info string) error {
 	if n < min || max < n {
@@ -322,19 +344,162 @@ func (p Printer) SetFont(n int) error {
 
 // Justify sets the alignment to n
 func (p Printer) Justify(j Justification) error {
-	_, err := p.Write([]byte{ESC, 'a', byte(j)})
+	errMsg := "could not justify: %w"
+
+	err := checkEnum(j, CenterJustify, LeftJustify, RightJustify)
 	if err != nil {
-		return fmt.Errorf("could not justify: %w", err)
+		return fmt.Errorf(errMsg, err)
 	}
+
+	_, err = p.Write([]byte{ESC, 'a', byte(j)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+	return nil
+}
+
+// PrintImage8 prints an image in the 8-bit row format.  In this format each
+// row is 8 dots tall.
+//
+// The density selects the horizontal DPI of the image.  SingleDensity is
+// 90dpi while DoubleDensity is 180dpi.  Vertical DPI is always 60dpi for
+// 8-bit image data.
+//
+// No black and white conversion is performed on the provided image.  The
+// image should be converted before calling this function.
+func (p Printer) PrintImage8(img image.Image, density Density) error {
+	imgRect := img.Bounds()
+	var err error
+	errMsg := "could not print 8 dot image: %w"
+
+	err = checkEnum(density, SingleDensity, DoubleDensity)
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	// 8 dot density (meta row is 8 dots tall)
+	for y := 0; y < imgRect.Max.Y; y += 8 {
+		row := []byte{}
+		for x := 0; x < imgRect.Max.X; x++ {
+			col := byte(0)
+
+			for i := 0; i < 8; i++ {
+				col <<= 1
+				// Pad the bottom row to be white
+				if y+i > imgRect.Max.Y {
+					continue
+				}
+				c := color.GrayModel.Convert(img.At(x, y+i)).(color.Gray)
+				if c.Y == 0 {
+					col |= 1
+				}
+			}
+
+			row = append(row, col)
+		}
+
+		data := []byte{ESC, '*', byte(density), byte(len(row)), byte(len(row) >> 8)}
+
+		if err = p.SetLineSpacing(0); err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
+		if _, err = p.Write(append(data, row...)); err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
+		if err = p.LF(); err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
+	}
+
+	return nil
+}
+
+// PrintImage24 prints an image in the 24-bit row format.  In this format each
+// row is 24 dots tall.
+//
+// This works the same as PrintImage8() with the only difference being the DPI
+// of the printed image.  SingleDensity is 90dpi while DoubleDensity is
+// 180dpi.  Vertical DPI is always 180dpi for 24-bit image data.
+func (p Printer) PrintImage24(img image.Image, density Density) error {
+	imgRect := img.Bounds()
+	var err error
+	errMsg := "could not print 24 dot image: %w"
+
+	err = checkEnum(density, SingleDensity, DoubleDensity)
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	imgBytes := [][]byte{}
+
+	// First convert the image data to the 1-bit data format.
+	// 24 dot density (meta row is 24 dots tall (3 bytes))
+	for y := 0; y < imgRect.Max.Y; y += 24 {
+		metaRow := []byte{}
+		for x := 0; x < imgRect.Max.X; x++ {
+
+			for z := 0; z < 3; z++ {
+				col := byte(0)
+				for i := 0; i < 8; i++ {
+					col <<= 1
+					// Pad the bottom row to be white
+					if (y+z*8)+i > imgRect.Max.Y {
+						continue
+					}
+
+					c := color.GrayModel.Convert(img.At(x, (y+z*8)+i)).(color.Gray)
+					if c.Y == 0 {
+						col |= 1
+					}
+				}
+				metaRow = append(metaRow, col)
+			}
+
+		}
+		imgBytes = append(imgBytes, metaRow)
+	}
+
+	// Next send the data to the printer.
+	command := []byte{ESC, 0x2A, byte(density), byte(imgRect.Max.X), byte(imgRect.Max.X >> 8)}
+	for _, row := range imgBytes {
+		err = p.SetLineSpacing(0)
+		if err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
+
+		_, err = p.Write(append(command, row...))
+		if err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
+
+		err = p.LF()
+		if err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
+
+		// If data is sent to fast it won't make it to the printer and will
+		// stop printing part of the way through an image.  This will also
+		// lose any commands sent after the image.  Sleeping for 35ms seems to
+		// be the best balance between not printing and reducing banding.
+		time.Sleep(time.Millisecond * 35)
+	}
+
 	return nil
 }
 
 // SetHRIPosition sets the printing position of the HRI characters
 // in relation to the barcode
 func (p Printer) SetHRIPosition(hp HRIPosition) error {
-	_, err := p.Write([]byte{GS, 'H', byte(hp)})
+	errMsg := "could not set HRI position: %w"
+
+	err := checkEnum(hp, HRINone, HRIAbove, HRIBelow, HRIBoth)
 	if err != nil {
-		return fmt.Errorf("could not set HRI position: %w", err)
+		return fmt.Errorf(errMsg, err)
+	}
+
+	_, err = p.Write([]byte{GS, 'H', byte(hp)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
 	return nil
 }

@@ -397,7 +397,7 @@ func TestBeep(t *testing.T) {
 }
 
 func TestJustify(t *testing.T) {
-	for _, j := range []hoin.Justification{hoin.JLeft, hoin.JCenter, hoin.JRight} {
+	for _, j := range []hoin.Justification{hoin.LeftJustify, hoin.CenterJustify, hoin.RightJustify} {
 		t.Run(fmt.Sprint(j), func(t *testing.T) {
 			buffer, printer := newPrinter()
 
@@ -410,7 +410,7 @@ func TestJustify(t *testing.T) {
 }
 
 func TestSetHRIPosition(t *testing.T) {
-	for _, hp := range []hoin.HRIPosition{hoin.HNone, hoin.HAbove, hoin.HBelow, hoin.HBoth} {
+	for _, hp := range []hoin.HRIPosition{hoin.HRINone, hoin.HRIAbove, hoin.HRIBelow, hoin.HRIBoth} {
 		t.Run(fmt.Sprint(hp), func(t *testing.T) {
 			buffer, printer := newPrinter()
 

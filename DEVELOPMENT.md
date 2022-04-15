@@ -27,7 +27,7 @@ Programmer Manual Commands:
 - [ ] ESC $ nL nH ~ Set absolute print position
 - [ ] ESC % n ~ Select/cancel user-defined character set
 - [ ] ESC & y c1 c2 [x1 d1...d(x×x1)]...[xk d1...d(y×xK)] ~ Define user defined characters
-- [ ] ESC \* m nL nH d1... dk ~ Select bit-image mode
+- [x] ESC \* m nL nH d1... dk ~ Select bit-image mode
 - [ ] ESC - n ~ Turn underline mode on/off
 - [x] ESC 2 ~ Select default line spacing
   - ResetLineSpacing()
