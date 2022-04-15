@@ -460,7 +460,7 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 	}
 
 	// Next send the data to the printer.
-	command := []byte{ESC, 0x2A, byte(density), byte(imgRect.Max.X), byte(imgRect.Max.X >> 8)}
+	command := []byte{ESC, 0x2A, byte(density + 32), byte(imgRect.Max.X), byte(imgRect.Max.X >> 8)}
 	for _, row := range imgBytes {
 		err = p.SetLineSpacing(0)
 		if err != nil {
