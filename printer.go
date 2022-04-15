@@ -2,9 +2,9 @@ package hoin
 
 import (
 	"fmt"
-	"io"
 	"image"
 	"image/color"
+	"io"
 	"time"
 )
 
@@ -20,27 +20,38 @@ const (
 type Justification byte
 
 const (
-	JLeft Justification = iota
-	JCenter
-	JRight
+	LeftJustify Justification = iota
+	CenterJustify
+	RightJustify
 )
 
 type HRIPosition byte
 
 const (
-	HNone HRIPosition = iota
-	HAbove
-	HBelow
-	HBoth
+	HRINone HRIPosition = iota
+	HRIAbove
+	HRIBelow
+	HRIBoth
 )
 
 // Density represents the DPI to use when printing images.
-type Density bool
+type Density byte
 
 const (
-	SingleDensity Density = false // 90dpi
-	DoubleDensity Density = true  // 180dpi
+	// SingleDensity is 90dpi
+	SingleDensity Density = iota
+	// DoubleDensity is 180dpi
+	DoubleDensity
 )
+
+func checkEnum[T ~byte](e T, enums ...T) error {
+	for _, en := range enums {
+		if e == en {
+			return nil
+		}
+	}
+	return fmt.Errorf("%v was not a valid choice from %v", e, enums)
+}
 
 func checkRange(n, min, max int, info string) error {
 	if n < min || max < n {
@@ -333,9 +344,16 @@ func (p Printer) SetFont(n int) error {
 
 // Justify sets the alignment to n
 func (p Printer) Justify(j Justification) error {
-	_, err := p.Write([]byte{ESC, 'a', byte(j)})
+	errMsg := "could not justify: %w"
+
+	err := checkEnum(j, CenterJustify, LeftJustify, RightJustify)
 	if err != nil {
-		return fmt.Errorf("could not justify: %w", err)
+		return fmt.Errorf(errMsg, err)
+	}
+
+	_, err = p.Write([]byte{ESC, 'a', byte(j)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
 	return nil
 }
@@ -354,9 +372,9 @@ func (p Printer) PrintImage8(img image.Image, density Density) error {
 	var err error
 	errMsg := "could not print 8 dot image: %w"
 
-	hd := byte(0)
-	if density {
-		hd = 1
+	err = checkEnum(density, SingleDensity, DoubleDensity)
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
 
 	// 8 dot density (meta row is 8 dots tall)
@@ -380,7 +398,7 @@ func (p Printer) PrintImage8(img image.Image, density Density) error {
 			row = append(row, col)
 		}
 
-		data := []byte{ESC, '*', hd, byte(len(row)), byte(len(row)>>8)}
+		data := []byte{ESC, '*', byte(density), byte(len(row)), byte(len(row) >> 8)}
 
 		if err = p.SetLineSpacing(0); err != nil {
 			return fmt.Errorf(errMsg, err)
@@ -407,9 +425,9 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 	var err error
 	errMsg := "could not print 24 dot image: %w"
 
-	hd := byte(32)
-	if density {
-		hd = 33
+	err = checkEnum(density, SingleDensity, DoubleDensity)
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
 
 	imgBytes := [][]byte{}
@@ -442,7 +460,7 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 	}
 
 	// Next send the data to the printer.
-	command := []byte{ESC, 0x2A, hd, byte(imgRect.Max.X), byte(imgRect.Max.X>>8)}
+	command := []byte{ESC, 0x2A, byte(density), byte(imgRect.Max.X), byte(imgRect.Max.X >> 8)}
 	for _, row := range imgBytes {
 		err = p.SetLineSpacing(0)
 		if err != nil {
@@ -472,9 +490,16 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 // SetHRIPosition sets the printing position of the HRI characters
 // in relation to the barcode
 func (p Printer) SetHRIPosition(hp HRIPosition) error {
-	_, err := p.Write([]byte{GS, 'H', byte(hp)})
+	errMsg := "could not set HRI position: %w"
+
+	err := checkEnum(hp, HRINone, HRIAbove, HRIBelow, HRIBoth)
 	if err != nil {
-		return fmt.Errorf("could not set HRI position: %w", err)
+		return fmt.Errorf(errMsg, err)
+	}
+
+	_, err = p.Write([]byte{GS, 'H', byte(hp)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
 	return nil
 }
