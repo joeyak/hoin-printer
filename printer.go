@@ -341,10 +341,13 @@ func (p Printer) PrintImage8(img image.Image, density Density) error {
 		for x := 0; x < imgRect.Max.X; x++ {
 			col := byte(0)
 
-			// Image probably needs to be padded for this stuff
 			for i := 0; i < 8; i++ {
-				c := color.GrayModel.Convert(img.At(x, y+i)).(color.Gray)
 				col <<= 1
+				// Pad the bottom row to be white
+				if y+i > imgRect.Max.Y {
+					continue
+				}
+				c := color.GrayModel.Convert(img.At(x, y+i)).(color.Gray)
 				if c.Y == 0 {
 					col |= 1
 				}
@@ -393,12 +396,16 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 		metaRow := []byte{}
 		for x := 0; x < imgRect.Max.X; x++ {
 
-			// Image probably needs to be padded for this stuff
 			for z := 0; z < 3; z++ {
 				col := byte(0)
 				for i := 0; i < 8; i++ {
-					c := color.GrayModel.Convert(img.At(x, (y+z*8)+i)).(color.Gray)
 					col <<= 1
+					// Pad the bottom row to be white
+					if (y+z*8)+i > imgRect.Max.Y {
+						continue
+					}
+
+					c := color.GrayModel.Convert(img.At(x, (y+z*8)+i)).(color.Gray)
 					if c.Y == 0 {
 						col |= 1
 					}
