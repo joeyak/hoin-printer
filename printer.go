@@ -43,11 +43,37 @@ const (
 	DoubleDensity
 )
 
-func checkEnum[T ~byte](e T, enums ...T) error {
-	for _, en := range enums {
-		if e == en {
-			return nil
+type BarCode byte
+
+const (
+	BcUPCA BarCode = iota
+	BcUPCE
+	BcJAN13
+	BcJAN8
+	BcCODE39
+	BcITF
+	BcCODABAR
+	BcCODE93
+	BcCODE123
+)
+
+var (
+	lengthBarcodes = []BarCode{BcCODE93, BcCODE123}
+	allBarcodes    = append(lengthBarcodes, BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcCODE39, BcITF, BcCODABAR)
+)
+
+func inSlice[T ~byte](v T, s ...T) bool {
+	for _, a := range s {
+		if v == a {
+			return true
 		}
+	}
+	return false
+}
+
+func checkEnum[T ~byte](e T, enums ...T) error {
+	if inSlice(e, enums...) {
+		return nil
 	}
 	return fmt.Errorf("%v was not a valid choice from %v", e, enums)
 }
@@ -504,5 +530,73 @@ func (p Printer) SetHRIPosition(hp HRIPosition) error {
 	if err != nil {
 		return fmt.Errorf(errMsg, err)
 	}
+	return nil
+}
+
+// ResetBarCodeHeight sets the barcode height to 162
+func (p Printer) ResetBarCodeHeight() error {
+	err := p.SetBarCodeHeight(162)
+	if err != nil {
+		return fmt.Errorf("could not reset barcode height: %w", err)
+	}
+	return nil
+}
+
+// SetBarCodeHeight sets the barcode height in n dots
+func (p Printer) SetBarCodeHeight(n int) error {
+	errMsg := "could not set bar code height: %w"
+
+	err := checkRange(n, 1, 255, "height")
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	_, err = p.Write([]byte{GS, 'h', byte(n)})
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	return nil
+}
+
+func (p Printer) PrintBarCode(barcodeType BarCode, data ...byte) error {
+	errMsg := "could not print bar code: %w"
+
+	err := checkEnum(barcodeType, allBarcodes...)
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	dataLength := len(data)
+
+	// Check length
+	var min, max int
+	if barcodeType == BcUPCA {
+		min, max = 11, 12
+	}
+
+	err = checkRange(dataLength, min, max, "data length")
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	msg := []byte{0x1D, 'k', byte(barcodeType)}
+
+	// Add data
+	if inSlice(barcodeType, lengthBarcodes...) {
+		// length defined barcode
+		msg = append(msg, byte(dataLength))
+		msg = append(msg, data...)
+	} else {
+		// Null ending barcode
+		msg = append(msg, data...)
+		msg = append(msg, 0)
+	}
+
+	_, err = p.Write(msg)
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
 	return nil
 }
