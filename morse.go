@@ -101,17 +101,56 @@ func stringToMorse(s string) []int {
 	return data
 }
 
-// Morse beeps out the message in morse code
-func (p Printer) Morse(message string) error {
+func printMorse(p Printer, message string, f func(t int) error) error {
+	errMsg := "could not send morse code beeps: %w"
+
 	data := stringToMorse(message)
 	for _, t := range data {
+		err := f(t)
+		if err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
+
 		if t != 0 {
 			err := p.Beep(1, t)
 			if err != nil {
-				return fmt.Errorf("could not send morse code beeps")
+				return fmt.Errorf(errMsg, err)
 			}
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
+	return nil
+}
+
+// Morse beeps out the message in morse code
+func (p Printer) Morse(message string) error {
+	return printMorse(p, message, func(t int) error { return nil })
+}
+
+// MorsePrint beeps out the morse message but also prints it to the paper
+func (p Printer) MorsePrint(message string) error {
+	errMsg := "could not print morse: %w"
+
+	err := printMorse(p, message, func(t int) error {
+		var err error
+		if t == 0 {
+			err = p.Print(" ")
+		} else if t == 1 {
+			err = p.Print(".")
+		} else {
+			err = p.Print("-")
+		}
+		return err
+	})
+
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	err = p.LF()
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
 	return nil
 }
