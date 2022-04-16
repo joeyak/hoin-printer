@@ -84,6 +84,8 @@ func stringToMorse(s string) []int {
 				timings = []int{3, 3, 3, 1, 1}
 			case '9':
 				timings = []int{3, 3, 3, 3, 1}
+			default:
+				continue
 			}
 			for _, t := range timings {
 				if t == 0 {
@@ -99,17 +101,17 @@ func stringToMorse(s string) []int {
 	return data
 }
 
+// Morse beeps out the message in morse code
 func (p Printer) Morse(message string) error {
 	data := stringToMorse(message)
 	for _, t := range data {
-		if t == 0 {
-			time.Sleep(100 * time.Millisecond)
-		} else {
+		if t != 0 {
 			err := p.Beep(1, t)
 			if err != nil {
 				return fmt.Errorf("could not send morse code beeps")
 			}
 		}
+		time.Sleep(100 * time.Millisecond)
 	}
 	return nil
 }
