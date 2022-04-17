@@ -588,23 +588,23 @@ func checkBarcodeData(data, accepted string) error {
 
 // PrintBarCode prints the bar code passed in with data.
 //
-// The size ranges are as follows in (Type: min, max)
-// BcUPCA: 11, 12
-// BcUPCE: 6, 7
-// BcJAN13: 12, 13
-// BcJAN8: 7, 8
-// BcCODE39: 0, 14
-// BcITF: 0, 22
-// BcCODABAR: 2, 19
-// BcCODE93: 1, 17
-// BcCODE123: 0, 65
+// The size ranges are as follows in (Type: min, max):
+//   BcUPCA: 11, 12
+//   BcUPCE: 6, 7
+//   BcJAN13: 12, 13
+//   BcJAN8: 7, 8
+//   BcCODE39: 0, 14
+//   BcITF: 0, 22
+//   BcCODABAR: 2, 19
+//   BcCODE93: 1, 17
+//   BcCODE123: 0, 65
 //
 // For the accepted data values:
-// BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcITF all only accept [0123456789]
-// BcCODE39, BcCODE93, BcCODE123 can accept [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.*$/+% ]
-// BcCODABAR:
-//   The first and last character of the CODABAR code bar has to be one of [ABCD]
-//   and the rest of the characters in between can be one of [0123456789-$:/.+]
+//   BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcITF all only accept [0123456789]
+//   BcCODE39, BcCODE93, BcCODE123 can accept [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.*$/+% ]
+//   BcCODABAR:
+//     The first and last character of the CODABAR code bar has to be one of [ABCD]
+//     and the rest of the characters in between can be one of [0123456789-$:/.+]
 //
 // Note on the CODE123 length:
 //   ...the docs say it's between 2 and 255 but the printer
