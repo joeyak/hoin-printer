@@ -82,9 +82,13 @@ Programmer Manual Commands:
   - Cut()
 - [ ] GS W nL nH ~ Set printing area width
 - [ ] GS f n ~ Select font for Human Readable Interpretation (HRI) characters
-- [ ] GS h n ~ Select bar code height
-- [ ] GS k m d1...dk NUL ~ Print bar code
-- [ ] GS k m n d1...dn ~ Print var code
+- [x] GS h n ~ Select bar code height
+  - SetBarCodeHeight()
+  - ResetBarCodeHeight()
+- [x] GS k m d1...dk NUL ~ Print bar code
+  - PrintBarCode()
+- [x] GS k m n d1...dn ~ Print bar code
+  - PrintBarCode()
 - [ ] GS v 0 m xL xH yL yH d1...dk ~ Print raster bit image
 - [ ] GS w n ~ Set bar code width
 - [ ] FS ! n ~ Set print mode(s) for Kanji characters
