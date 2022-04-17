@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"io"
+	"strings"
 )
 
 const (
@@ -53,8 +54,8 @@ const (
 	BcCODE39
 	BcITF
 	BcCODABAR
-	BcCODE93
-	BcCODE123
+	BcCODE93  BarCode = 72
+	BcCODE123 BarCode = 73
 )
 
 var (
@@ -533,16 +534,16 @@ func (p Printer) SetHRIPosition(hp HRIPosition) error {
 	return nil
 }
 
-// ResetBarCodeHeight sets the barcode height to 162
+// ResetBarCodeHeight sets the bar code height to 162
 func (p Printer) ResetBarCodeHeight() error {
 	err := p.SetBarCodeHeight(162)
 	if err != nil {
-		return fmt.Errorf("could not reset barcode height: %w", err)
+		return fmt.Errorf("could not reset bar code height: %w", err)
 	}
 	return nil
 }
 
-// SetBarCodeHeight sets the barcode height in n dots
+// SetBarCodeHeight sets the bar code height in n dots
 func (p Printer) SetBarCodeHeight(n int) error {
 	errMsg := "could not set bar code height: %w"
 
@@ -559,7 +560,60 @@ func (p Printer) SetBarCodeHeight(n int) error {
 	return nil
 }
 
-func (p Printer) PrintBarCode(barcodeType BarCode, data ...byte) error {
+func checkBarcodeCodabarData(data string) error {
+	body := "0123456789-$:/.+"
+	wrappers := "ABCD"
+
+	if !strings.ContainsRune(wrappers, rune(data[0])) || !strings.ContainsRune(wrappers, rune(data[len(data)-1])) {
+		return fmt.Errorf("the first and last byte of CODABAR must be one of %s", wrappers)
+	}
+
+	for _, d := range data {
+		if !strings.ContainsRune(body, d) {
+			return fmt.Errorf("%s was in the bar code data and only %q is accepted", string(d), body)
+		}
+	}
+
+	return nil
+}
+
+func checkBarcodeData(data, accepted string) error {
+	for _, d := range data {
+		if !strings.ContainsRune(accepted, d) {
+			return fmt.Errorf("%s was in the bar code data and only %q is accepted", string(d), accepted)
+		}
+	}
+	return nil
+}
+
+// PrintBarCode prints the bar code passed in with data.
+//
+// The size ranges are as follows in (Type: min, max)
+// BcUPCA: 11, 12
+// BcUPCE: 6, 7
+// BcJAN13: 12, 13
+// BcJAN8: 7, 8
+// BcCODE39: 0, 14
+// BcITF: 0, 22
+// BcCODABAR: 2, 19
+// BcCODE93: 1, 17
+// BcCODE123: 0, 65
+//
+// For the accepted data values:
+// BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcITF all only accept [0123456789]
+// BcCODE39, BcCODE93, BcCODE123 can accept [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.*$/+% ]
+// BcCODABAR:
+//   The first and last character of the CODABAR code bar has to be one of [ABCD]
+//   and the rest of the characters in between can be one of [0123456789-$:/.+]
+//
+// Note on the CODE123 length:
+//   ...the docs say it's between 2 and 255 but the printer
+//   does not have that limit. On one hand it can go down to 0 character, but also I could
+//   not find the limit for max characters. At 15 characters it went off the page with a
+//   HOP-E802 printer and at 34 characters it starts printing the HRI weird. At 66 0s
+//   repeating it seems to break and stop printing, and the same at 65 As repeating.
+//   Long story short...I think they didn't finish programming the checks on CODE123
+func (p Printer) PrintBarCode(barcodeType BarCode, data string) error {
 	errMsg := "could not print bar code: %w"
 
 	err := checkEnum(barcodeType, allBarcodes...)
@@ -571,11 +625,45 @@ func (p Printer) PrintBarCode(barcodeType BarCode, data ...byte) error {
 
 	// Check length
 	var min, max int
-	if barcodeType == BcUPCA {
+	switch barcodeType {
+	case BcUPCA:
 		min, max = 11, 12
+	case BcUPCE:
+		min, max = 6, 7
+	case BcJAN13:
+		min, max = 12, 13
+	case BcJAN8:
+		min, max = 7, 8
+	case BcCODE39:
+		min, max = 0, 14
+	case BcITF:
+		min, max = 0, 22
+	case BcCODABAR:
+		min, max = 2, 19
+	case BcCODE93:
+		min, max = 1, 17
+	case BcCODE123:
+		// At 66 characters for 'A...' the printer seems to cry
+		// for printing all 0s it cried at 65
+		// maybe it needs some friends
+		min, max = 0, 60
 	}
 
 	err = checkRange(dataLength, min, max, "data length")
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
+	}
+
+	// Check data ranges
+	switch barcodeType {
+	case BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcITF:
+		err = checkBarcodeData(data, "0123456789")
+	case BcCODE39, BcCODE93, BcCODE123:
+		err = checkBarcodeData(data, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.*$/+% ")
+	case BcCODABAR:
+		err = checkBarcodeCodabarData(data)
+	}
+
 	if err != nil {
 		return fmt.Errorf(errMsg, err)
 	}
