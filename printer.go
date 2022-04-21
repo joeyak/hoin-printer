@@ -435,6 +435,12 @@ func (p Printer) PrintImage8(img image.Image, density Density) error {
 		if err = p.LF(); err != nil {
 			return fmt.Errorf(errMsg, err)
 		}
+
+		// Wait for line to finish
+		_, err = p.TransmitErrorStatus()
+		if err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
 	}
 
 	return nil
@@ -511,7 +517,10 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 
 		// Leaving above there just in case below is a footgun, but below should
 		// wait till print buffer is done to write more lines
-		p.TransmitErrorStatus()
+		_, err = p.TransmitErrorStatus()
+		if err != nil {
+			return fmt.Errorf(errMsg, err)
+		}
 	}
 
 	return nil

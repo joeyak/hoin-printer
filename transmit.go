@@ -84,7 +84,6 @@ func (p Printer) TransmitPaperSensorStatus() (PaperSensorStatus, error) {
 		return PaperSensorStatus{}, fmt.Errorf("could not transmit error status: %w", err)
 	}
 
-	fmt.Printf("%08b\n", b)
 	return PaperSensorStatus{
 		NearEnd: b&0b0000_1100 == 0b0000_1100,
 		RollEnd: b&0b0110_0000 == 0b0110_0000,
