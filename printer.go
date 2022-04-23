@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"io"
+	"net"
 	"strings"
 )
 
@@ -101,6 +102,27 @@ func NewPrinter(dst io.ReadWriter) Printer {
 	return Printer{
 		dst: dst,
 	}
+}
+
+func NewIpPrinter(addr string) (Printer, error) {
+	conn, err := net.Dial("tcp", addr)
+	if err != nil {
+		return Printer{}, fmt.Errorf("unable to dial: %w", err)
+	}
+	return NewPrinter(conn), nil
+}
+
+func (p Printer) Close() error {
+	closer, ok := p.dst.(io.Closer)
+	if p.dst == nil || !ok {
+		return nil
+	}
+
+	err := closer.Close()
+	if err != nil {
+		return fmt.Errorf("could not close printer: %w", err)
+	}
+	return nil
 }
 
 func (p Printer) Write(b []byte) (int, error) {
