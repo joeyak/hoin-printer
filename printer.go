@@ -18,7 +18,14 @@ const (
 	DLE = 0x10
 )
 
-type Justification byte
+type Font int
+
+const (
+	FontA Font = iota
+	FontB
+)
+
+type Justification int
 
 const (
 	LeftJustify Justification = iota
@@ -26,7 +33,7 @@ const (
 	RightJustify
 )
 
-type HRIPosition byte
+type HRIPosition int
 
 const (
 	HRINone HRIPosition = iota
@@ -36,7 +43,7 @@ const (
 )
 
 // Density represents the DPI to use when printing images.
-type Density byte
+type Density int
 
 const (
 	// SingleDensity is 90dpi
@@ -45,7 +52,7 @@ const (
 	DoubleDensity
 )
 
-type BarCode byte
+type BarCode int
 
 const (
 	BcUPCA BarCode = iota
@@ -64,7 +71,7 @@ var (
 	allBarcodes    = append(lengthBarcodes, BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcCODE39, BcITF, BcCODABAR)
 )
 
-func inSlice[T ~byte](v T, s ...T) bool {
+func inSlice[T ~int](v T, s ...T) bool {
 	for _, a := range s {
 		if v == a {
 			return true
@@ -73,7 +80,7 @@ func inSlice[T ~byte](v T, s ...T) bool {
 	return false
 }
 
-func checkEnum[T ~byte](e T, enums ...T) error {
+func checkEnum[T ~int](e T, enums ...T) error {
 	if inSlice(e, enums...) {
 		return nil
 	}
@@ -375,14 +382,15 @@ func (p Printer) SetReversePrinting(b bool) error {
 //
 // n=0 selects font A
 // n=1 selects font B
-func (p Printer) SetFont(n int) error {
+func (p Printer) SetFont(f Font) error {
 	errMsg := "could not set font: %w"
 
-	if !(n == 0 || n == 1) {
-		return fmt.Errorf(errMsg, fmt.Errorf("n must be 0 or 1"))
+	err := checkEnum(f, FontA, FontB)
+	if err != nil {
+		return fmt.Errorf(errMsg, err)
 	}
 
-	_, err := p.Write([]byte{ESC, 'M', byte(n)})
+	_, err = p.Write([]byte{ESC, 'M', byte(f)})
 	if err != nil {
 		return fmt.Errorf(errMsg, err)
 	}
