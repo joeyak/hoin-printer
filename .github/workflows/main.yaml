@@ -6,7 +6,7 @@ on:
   - workflow_dispatch
 
 jobs:
-  test:
+  vet:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,6 +18,3 @@ jobs:
 
       - name: vet
         run: go vet ./...
-      
-      - name: test
-        run: go test ./...
