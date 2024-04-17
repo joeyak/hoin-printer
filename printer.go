@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/color"
 	"io"
-	"net"
 	"strings"
 )
 
@@ -112,7 +111,7 @@ func NewPrinter(dst io.ReadWriter) Printer {
 }
 
 func NewIpPrinter(addr string) (Printer, error) {
-	conn, err := net.Dial("tcp", addr)
+	conn, err := newHealingConn(addr)
 	if err != nil {
 		return Printer{}, fmt.Errorf("unable to dial: %w", err)
 	}
@@ -378,6 +377,18 @@ func (p Printer) SetReversePrinting(b bool) error {
 	return nil
 }
 
+// SetReversePrinting sets the white/black printing mode
+//
+// If b is true then it will print normal orientation
+// If b is false then it will print upside down
+func (p Printer) SetUpsideDownPrinting(b bool) error {
+	_, err := p.Write([]byte{ESC, '{', boolToByte(b)})
+	if err != nil {
+		return fmt.Errorf("could not set upside-down printing mode: %w", err)
+	}
+	return nil
+}
+
 // SetFont changes the font
 //
 // n=0 selects font A
@@ -628,30 +639,33 @@ func checkBarcodeData(data, accepted string) error {
 // PrintBarCode prints the bar code passed in with data.
 //
 // The size ranges are as follows in (Type: min, max):
-//   BcUPCA: 11, 12
-//   BcUPCE: 6, 7
-//   BcJAN13: 12, 13
-//   BcJAN8: 7, 8
-//   BcCODE39: 0, 14
-//   BcITF: 0, 22
-//   BcCODABAR: 2, 19
-//   BcCODE93: 1, 17
-//   BcCODE123: 0, 65
+//
+//	BcUPCA: 11, 12
+//	BcUPCE: 6, 7
+//	BcJAN13: 12, 13
+//	BcJAN8: 7, 8
+//	BcCODE39: 0, 14
+//	BcITF: 0, 22
+//	BcCODABAR: 2, 19
+//	BcCODE93: 1, 17
+//	BcCODE123: 0, 65
 //
 // For the accepted data values:
-//   BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcITF all only accept [0123456789]
-//   BcCODE39, BcCODE93, BcCODE123 can accept [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.*$/+% ]
-//   BcCODABAR:
-//     The first and last character of the CODABAR code bar has to be one of [ABCD]
-//     and the rest of the characters in between can be one of [0123456789-$:/.+]
+//
+//	BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcITF all only accept [0123456789]
+//	BcCODE39, BcCODE93, BcCODE123 can accept [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.*$/+% ]
+//	BcCODABAR:
+//	  The first and last character of the CODABAR code bar has to be one of [ABCD]
+//	  and the rest of the characters in between can be one of [0123456789-$:/.+]
 //
 // Note on the CODE123 length:
-//   ...the docs say it's between 2 and 255 but the printer
-//   does not have that limit. On one hand it can go down to 0 character, but also I could
-//   not find the limit for max characters. At 15 characters it went off the page with a
-//   HOP-E802 printer and at 34 characters it starts printing the HRI weird. At 66 0s
-//   repeating it seems to break and stop printing, and the same at 65 As repeating.
-//   Long story short...I think they didn't finish programming the checks on CODE123
+//
+//	...the docs say it's between 2 and 255 but the printer
+//	does not have that limit. On one hand it can go down to 0 character, but also I could
+//	not find the limit for max characters. At 15 characters it went off the page with a
+//	HOP-E802 printer and at 34 characters it starts printing the HRI weird. At 66 0s
+//	repeating it seems to break and stop printing, and the same at 65 As repeating.
+//	Long story short...I think they didn't finish programming the checks on CODE123
 func (p Printer) PrintBarCode(barcodeType BarCode, data string) error {
 	errMsg := "could not print bar code: %w"
 
