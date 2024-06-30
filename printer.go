@@ -492,14 +492,13 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 		return fmt.Errorf(errMsg, err)
 	}
 
-	imgBytes := [][]byte{}
+	command := []byte{ESC, 0x2A, byte(density + 32), byte(imgRect.Max.X), byte(imgRect.Max.X >> 8)}
 
-	// First convert the image data to the 1-bit data format.
 	// 24 dot density (meta row is 24 dots tall (3 bytes))
 	for y := 0; y < imgRect.Max.Y; y += 24 {
-		metaRow := []byte{}
-		for x := 0; x < imgRect.Max.X; x++ {
+		row := []byte{}
 
+		for x := 0; x < imgRect.Max.X; x++ {
 			for z := 0; z < 3; z++ {
 				col := byte(0)
 				for i := 0; i < 8; i++ {
@@ -514,16 +513,10 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 						col |= 1
 					}
 				}
-				metaRow = append(metaRow, col)
+				row = append(row, col)
 			}
-
 		}
-		imgBytes = append(imgBytes, metaRow)
-	}
 
-	// Next send the data to the printer.
-	command := []byte{ESC, 0x2A, byte(density + 32), byte(imgRect.Max.X), byte(imgRect.Max.X >> 8)}
-	for _, row := range imgBytes {
 		err = p.SetLineSpacing(0)
 		if err != nil {
 			return fmt.Errorf(errMsg, err)
