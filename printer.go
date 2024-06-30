@@ -446,7 +446,7 @@ func (p Printer) PrintImage8(img image.Image, density Density) error {
 					continue
 				}
 				c := color.GrayModel.Convert(img.At(x, y+i)).(color.Gray)
-				if c.Y == 0 {
+				if c.Y < 0x80 {
 					col |= 1
 				}
 			}
@@ -510,7 +510,7 @@ func (p Printer) PrintImage24(img image.Image, density Density) error {
 					}
 
 					c := color.GrayModel.Convert(img.At(x, (y+z*8)+i)).(color.Gray)
-					if c.Y == 0 {
+					if c.Y < 0x80 {
 						col |= 1
 					}
 				}
