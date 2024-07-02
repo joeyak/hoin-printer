@@ -38,3 +38,13 @@ func main() {
 	printer.Cut()
 }
 ```
+
+## Testing
+
+What? Did I hear you ask for testing? You think we make useless mocks that only tests our assumptions about the hoin printer instead of REAL **HONEST** ***GOOD*** boots on the ground testing.
+
+Run `go run ./cmd/test-printer/` to print out our test program.
+
+Really, how are we supposed to tests without a firmware dump? Total incongruity.
+
+Also the test program assumes some things will work line printing and the such, cause how can we test functions without that. It'd be obvious if nothing prints. The goal is to test all the extra functions like horizontal tabbing, justifications, images, etc.

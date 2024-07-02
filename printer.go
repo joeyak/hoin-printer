@@ -10,6 +10,9 @@ import (
 )
 
 const (
+	// Default ip and port for hoin printers
+	DefaultPrinterIP = "192.168.1.23:9100"
+
 	HT  = 0x09
 	LF  = 0x0A
 	CR  = 0x0D
@@ -383,16 +386,16 @@ func (p Printer) SetReversePrinting(b bool) error {
 // n=0 selects font A
 // n=1 selects font B
 func (p Printer) SetFont(f Font) error {
-	errMsg := "could not set font: %w"
+	errMsg := "could not set font to %v: %w"
 
 	err := checkEnum(f, FontA, FontB)
 	if err != nil {
-		return fmt.Errorf(errMsg, err)
+		return fmt.Errorf(errMsg, f, err)
 	}
 
 	_, err = p.Write([]byte{ESC, 'M', byte(f)})
 	if err != nil {
-		return fmt.Errorf(errMsg, err)
+		return fmt.Errorf(errMsg, f, err)
 	}
 
 	return nil
@@ -400,16 +403,16 @@ func (p Printer) SetFont(f Font) error {
 
 // Justify sets the alignment to n
 func (p Printer) Justify(j Justification) error {
-	errMsg := "could not justify: %w"
+	errMsg := "could not set justify to %v: %w"
 
 	err := checkEnum(j, CenterJustify, LeftJustify, RightJustify)
 	if err != nil {
-		return fmt.Errorf(errMsg, err)
+		return fmt.Errorf(errMsg, j, err)
 	}
 
 	_, err = p.Write([]byte{ESC, 'a', byte(j)})
 	if err != nil {
-		return fmt.Errorf(errMsg, err)
+		return fmt.Errorf(errMsg, j, err)
 	}
 	return nil
 }
@@ -621,30 +624,33 @@ func checkBarcodeData(data, accepted string) error {
 // PrintBarCode prints the bar code passed in with data.
 //
 // The size ranges are as follows in (Type: min, max):
-//   BcUPCA: 11, 12
-//   BcUPCE: 6, 7
-//   BcJAN13: 12, 13
-//   BcJAN8: 7, 8
-//   BcCODE39: 0, 14
-//   BcITF: 0, 22
-//   BcCODABAR: 2, 19
-//   BcCODE93: 1, 17
-//   BcCODE123: 0, 65
+//
+//	BcUPCA: 11, 12
+//	BcUPCE: 6, 7
+//	BcJAN13: 12, 13
+//	BcJAN8: 7, 8
+//	BcCODE39: 0, 14
+//	BcITF: 0, 22
+//	BcCODABAR: 2, 19
+//	BcCODE93: 1, 17
+//	BcCODE123: 0, 65
 //
 // For the accepted data values:
-//   BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcITF all only accept [0123456789]
-//   BcCODE39, BcCODE93, BcCODE123 can accept [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.*$/+% ]
-//   BcCODABAR:
-//     The first and last character of the CODABAR code bar has to be one of [ABCD]
-//     and the rest of the characters in between can be one of [0123456789-$:/.+]
+//
+//	BcUPCA, BcUPCE, BcJAN13, BcJAN8, BcITF all only accept [0123456789]
+//	BcCODE39, BcCODE93, BcCODE123 can accept [ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.*$/+% ]
+//	BcCODABAR:
+//	  The first and last character of the CODABAR code bar has to be one of [ABCD]
+//	  and the rest of the characters in between can be one of [0123456789-$:/.+]
 //
 // Note on the CODE123 length:
-//   ...the docs say it's between 2 and 255 but the printer
-//   does not have that limit. On one hand it can go down to 0 character, but also I could
-//   not find the limit for max characters. At 15 characters it went off the page with a
-//   HOP-E802 printer and at 34 characters it starts printing the HRI weird. At 66 0s
-//   repeating it seems to break and stop printing, and the same at 65 As repeating.
-//   Long story short...I think they didn't finish programming the checks on CODE123
+//
+//	...the docs say it's between 2 and 255 but the printer
+//	does not have that limit. On one hand it can go down to 0 character, but also I could
+//	not find the limit for max characters. At 15 characters it went off the page with a
+//	HOP-E802 printer and at 34 characters it starts printing the HRI weird. At 66 0s
+//	repeating it seems to break and stop printing, and the same at 65 As repeating.
+//	Long story short...I think they didn't finish programming the checks on CODE123
 func (p Printer) PrintBarCode(barcodeType BarCode, data string) error {
 	errMsg := "could not print bar code: %w"
 
