@@ -349,6 +349,16 @@ func (p Printer) SetHT(positions ...int) error {
 	return nil
 }
 
+// SetTabs will set up to 32 tab positions at the given width intervals.  If
+// the tab value exceeds 256, fewer than 32 positions will be set.
+func (p Printer) SetTabs(width int) error {
+	tabs := []int{}
+	for i := width; i < 256 && len(tabs) < 32; i+=width {
+		tabs = append(tabs, i)
+	}
+	return p.SetHT(tabs...)
+}
+
 // SetBold turns emphasized mode on or off
 func (p Printer) SetBold(b bool) error {
 	_, err := p.Write([]byte{ESC, 'E', boolToByte(b)})
