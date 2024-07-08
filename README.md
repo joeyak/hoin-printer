@@ -5,6 +5,8 @@
 [![GoDoc](https://godoc.org/github.com/joeyak/hoin-printer?status.svg)](https://godoc.org/github.com/joeyak/hoin-printer)
 ![tests](https://github.com/joeyak/hoin-printer/actions/workflows/main.yaml/badge.svg)
 
+<span style="color:red; font-size: 1.5rem">This repo has been moved to [https://github.com/joeyak/go-escpos](https://github.com/joeyak/go-escpos) to match the fact that these commands work on other ESC/POS Thermal Printers</span>
+
 This is a package for writing to a HOIN POS-80-Series Thermal Printer
 
 Connect to the printer with an io.ReadWriter and then send commands
